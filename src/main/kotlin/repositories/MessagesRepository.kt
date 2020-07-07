@@ -10,7 +10,8 @@ import java.time.LocalDateTime
 private typealias TopicId = Int
 
 interface MessagesRepository {
-    fun getActiveTopics(): List<Topic>
+    fun getActiveRoom(): Int?
+    fun getTopicsForRoom(id: Int): List<Topic>
     fun getTopicById(id: Int): Topic?
     fun createTopic(title: String, body: String, author: User): TopicId?
     fun createReply(parentId: Int, body: String, author: User): TopicId?
@@ -20,8 +21,15 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
     private enum class TopicHydrationType {
         DEEP, ABBREVIATED, SHALLOW
     }
-    override fun getActiveTopics(): List<Topic> {
-        return db.Topic.innerJoin(Room).select { db.Room.isActive eq true }.andWhere { db.Room.id eq db.Topic.room }.map { topicResult ->
+
+    override fun getActiveRoom(): Int? {
+        return db.Room.select { db.Room.isActive eq true }.firstOrNull()?.let {
+            it[db.Room.id].value
+        }
+    }
+
+    override fun getTopicsForRoom(id: Int): List<Topic> {
+        return db.Topic.innerJoin(Room).select { db.Room.id eq id }.andWhere { db.Room.id eq db.Topic.room }.map { topicResult ->
             hydrateTopic(topicResult, TopicHydrationType.ABBREVIATED)
         }
     }
@@ -70,22 +78,25 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
                 null
             }
         }
-        return Topic(
+        // Construct two topics: the base level topic, for the replies, and the one that contains the replies
+        val topic = Topic(
             title = row[db.Topic.title],
             body = row[db.Topic.body],
             posted = row[db.Topic.posted],
             author = userRepository.findUserById(row[db.Topic.author]) ?: User.getEmptyUser(),
             // TODO: Clean up and optimize these queries!!!
-            replies = topicQuery?.let {
-                it.map(::hydrateReply)
-            } ?: emptyList())
+            replies = emptyList())
+        return topic.copy(replies = topicQuery?.let {
+            it.map { replyRow -> hydrateReply(replyRow, topic) }
+        } ?: emptyList())
     }
 
-    private fun hydrateReply(row: ResultRow): Reply {
+    private fun hydrateReply(row: ResultRow, topic: Topic): Reply {
         return Reply(
             author = userRepository.findUserById(row[db.Reply.author]) ?: User.getEmptyUser(),
             body = row[db.Reply.body],
-            posted = row[db.Reply.posted]
+            posted = row[db.Reply.posted],
+            topic = topic
         )
     }
 }

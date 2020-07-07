@@ -32,17 +32,17 @@ class Router(
                 profileController.updateProfile(call).render()
             }
 
-            get("/login") {
+            get(LOGIN_URL) {
                 loginController.getLoginPage(call).render()
             }
-            post("/login") {
+            post(LOGIN_URL) {
                 loginController.performLogin(call).render()
             }
 
-            get("/topic/{topic_id}") {
+            get(getTopicUrl("{topic_id}")) {
                 messagesController.getTopicPage(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()
             }
-            post("/topic/{topic_id}") {
+            post(getTopicUrl("{topic_id}")) {
                 messagesController.postNewReply(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()
             }
 
@@ -59,5 +59,11 @@ class Router(
                 adminController.createRoom(call).render()
             }
         }
+    }
+
+    companion object{
+        const val LOGIN_URL = "/login"
+
+        fun getTopicUrl(topicId: String) = "/topic/$topicId"
     }
 }
