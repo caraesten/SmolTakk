@@ -6,6 +6,6 @@ import views.MustacheView
 import views.admin.viewmodels.Rooms
 
 class RoomsView(call: ApplicationCall, rooms: List<Room>) : MustacheView<Rooms>(call) {
-    override val templatePath = "path to room admin"
+    override val templatePath = "admin_rooms.html"
     override val templateData = Rooms(rooms)
 }

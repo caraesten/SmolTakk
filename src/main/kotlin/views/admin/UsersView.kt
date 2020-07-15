@@ -8,6 +8,6 @@ import views.admin.viewmodels.Rooms
 import views.admin.viewmodels.Users
 
 class UsersView(call: ApplicationCall, users: List<User>) : MustacheView<Users>(call) {
-    override val templatePath = "path to users admin"
+    override val templatePath = "admin_users.html"
     override val templateData = Users(users)
 }

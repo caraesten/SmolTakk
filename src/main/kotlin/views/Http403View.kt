@@ -5,5 +5,5 @@ import io.ktor.http.HttpStatusCode
 
 class Http403View(override val call: ApplicationCall) : ErrorView(call) {
     override val statusCode = HttpStatusCode.Unauthorized
-    override val templatePath = "path to 403 template"
+    override val templatePath = "403.html"
 }
