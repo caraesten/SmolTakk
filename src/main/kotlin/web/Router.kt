@@ -18,18 +18,18 @@ class Router(
             get("/") {
                 homePageController.getHomePage(call).render()
             }
-            get("/{room_id}") {
+            get("$ROOM_URL{room_id}") {
                 messagesController.getRoomPage(call.parameters["room_id"]?.toIntOrNull() ?: -1, call).render()
             }
-            post("/{room_id}") {
+            post("$ROOM_URL{room_id}") {
                 messagesController.postNewTopic(call.parameters["room_id"]?.toIntOrNull() ?: -1, call).render()
             }
 
-            get("/profile") {
-                profileController.getProfile(call).render()
+            get("$PROFILE_URL{username}") {
+                profileController.getProfile(call, call.parameters["username"]).render()
             }
-            post("/profile") {
-                profileController.updateProfile(call).render()
+            post("$PROFILE_URL{username}") {
+                profileController.updateProfile(call, call.parameters["username"]).render()
             }
 
             get(LOGIN_URL) {
@@ -44,6 +44,9 @@ class Router(
             }
             post(getTopicUrl("{topic_id}")) {
                 messagesController.postNewReply(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()
+            }
+            get("${getTopicUrl("{topic_id}")}/carryover") {
+                messagesController.carryOverTopic(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()
             }
 
             get("/admin/users") {
@@ -63,7 +66,12 @@ class Router(
 
     companion object{
         const val LOGIN_URL = "/login"
+        const val ROOM_URL = "/"
+        const val TOPIC_URL = "/topic/"
+        const val PROFILE_URL = "/profile/"
 
-        fun getTopicUrl(topicId: String) = "/topic/$topicId"
+        fun getTopicUrl(topicId: String) = "$TOPIC_URL$topicId"
+        fun getRoomUrl(roomId: Int) = "$ROOM_URL$roomId"
+        fun getProfileUrl(username: String) = "$PROFILE_URL$username"
     }
 }

@@ -16,6 +16,7 @@ dependencies {
     // TODO: Replace versions with imported properties
     implementation("io.ktor:ktor-server-core:1.3.2")
     implementation("io.ktor:ktor-server-netty:1.3.2")
+    implementation("io.ktor:ktor-server-sessions:1.3.2")
     implementation("io.ktor:ktor-mustache:1.3.2")
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("org.jetbrains.exposed:exposed-core:0.26.1")

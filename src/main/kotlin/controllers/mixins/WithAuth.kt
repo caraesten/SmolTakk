@@ -2,17 +2,21 @@ package controllers.mixins
 
 import constants.AppConstants
 import io.ktor.application.ApplicationCall
+import io.ktor.sessions.sessions
+import io.ktor.sessions.get
 import models.User
 import repositories.UserRepository
 import views.LoginRedirectView
 import views.View
+import web.SiteSession
+import java.lang.IllegalStateException
 
 interface WithAuth {
     val userRepository: UserRepository
 
-    private fun getLoggedInUser(call: ApplicationCall): User? {
-        return call.request.headers[AppConstants.AUTH_TOKEN_HEADER]?.let {
-            userRepository.findUserByAuthToken(it)
+    fun getLoggedInUser(call: ApplicationCall): User? {
+        return try { call.sessions.get<SiteSession>() } catch (e: IllegalStateException) { null }?.let {
+            userRepository.findUserByAuthToken(it.authToken)
         }
     }
 

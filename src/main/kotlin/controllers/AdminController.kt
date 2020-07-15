@@ -2,31 +2,74 @@ package controllers
 
 import controllers.mixins.WithAuth
 import io.ktor.application.ApplicationCall
+import io.ktor.request.receiveParameters
+import models.User
+import repositories.MessagesRepository
 import repositories.UserRepository
+import views.Http403View
+import views.RedirectView
 import views.View
+import views.admin.RoomsView
+import views.admin.UsersView
+import web.Router.Companion.ROOM_URL
+import web.Router.Companion.getProfileUrl
+
+private const val CARAS_EMAIL = "dondeesten@gmail.com" // lol I'm lazy sorry
+private const val PARAM_USERNAME = "username"
+private const val PARAM_EMAIL = "email"
+private const val PARAM_PASSWORD = "password"
 
 interface AdminController : WithAuth {
-    fun showUserAdminPage(applicationCall: ApplicationCall): View
-    fun showRoomAdminPage(applicationCall: ApplicationCall): View
-    fun createUser(applicationCall: ApplicationCall): View
-    fun createRoom(applicationCall: ApplicationCall): View
+    suspend fun showUserAdminPage(call: ApplicationCall): View
+    suspend fun showRoomAdminPage(call: ApplicationCall): View
+    suspend fun createUser(call: ApplicationCall): View
+    suspend fun createRoom(call: ApplicationCall): View
 }
 
-class AdminControllerImpl(override val userRepository: UserRepository) : AdminController {
-    override fun showUserAdminPage(applicationCall: ApplicationCall): View {
-        TODO("Not yet implemented")
+class AdminControllerImpl(override val userRepository: UserRepository, val messagesRepository: MessagesRepository) : AdminController {
+    override suspend fun showUserAdminPage(call: ApplicationCall): View {
+        return withAdminAuth(call) {
+            val users = userRepository.getAllUsers()
+            UsersView(call, users)
+        }
     }
 
-    override fun showRoomAdminPage(applicationCall: ApplicationCall): View {
-        TODO("Not yet implemented")
+    override suspend fun showRoomAdminPage(call: ApplicationCall): View {
+        return withAdminAuth(call) {
+            val rooms = messagesRepository.getAllRooms(true)
+            RoomsView(call, rooms)
+        }
     }
 
-    override fun createUser(applicationCall: ApplicationCall): View {
-        TODO("Not yet implemented")
+    override suspend fun createUser(call: ApplicationCall): View {
+        return withAdminAuth(call) {
+            val params = call.receiveParameters()
+            val email = params[PARAM_EMAIL]
+            val username = params[PARAM_USERNAME]
+            val password = params[PARAM_PASSWORD]
+            if (email.isNullOrEmpty() || username.isNullOrEmpty() || password.isNullOrEmpty()) {
+                RedirectView(call, "")
+            } else {
+                val user = userRepository.createUser(email, username, password)
+                RedirectView(call, if (user != null) getProfileUrl(user.username) else "")
+            }
+        }
     }
 
-    override fun createRoom(applicationCall: ApplicationCall): View {
-        TODO("Not yet implemented")
+    override suspend fun createRoom(call: ApplicationCall): View {
+        return withAdminAuth(call) {
+            messagesRepository.createRoom()
+            RedirectView(call, "")
+        }
     }
 
+    private suspend fun withAdminAuth(call: ApplicationCall, action: suspend (User) -> View): View {
+        return withAuth(call) {
+            if (it.email != CARAS_EMAIL) {
+                Http403View(call)
+            } else {
+                action(it)
+            }
+        }
+    }
 }

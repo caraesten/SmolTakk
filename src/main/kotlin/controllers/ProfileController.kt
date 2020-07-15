@@ -2,20 +2,52 @@ package controllers
 
 import controllers.mixins.WithAuth
 import io.ktor.application.ApplicationCall
+import io.ktor.request.receiveParameters
+import io.ktor.sessions.sessions
+import io.ktor.sessions.set
 import repositories.UserRepository
-import views.View
+import views.*
+import web.Router.Companion.getProfileUrl
+import web.SiteSession
+
+
+private const val PARAM_USERNAME = "username"
+private const val PARAM_PASSWORD = "password"
+private const val PARAM_EMAIL = "email"
 
 interface ProfileController : WithAuth {
-    fun getProfile(call: ApplicationCall): View
-    fun updateProfile(call: ApplicationCall): View
+    suspend fun getProfile(call: ApplicationCall, username: String?): View
+    suspend fun updateProfile(call: ApplicationCall, username: String?): View
 }
 
 class ProfileControllerImpl(override val userRepository: UserRepository) : ProfileController {
-    override fun getProfile(call: ApplicationCall): View {
-        TODO("Not yet implemented")
+    override suspend fun getProfile(call: ApplicationCall, username: String?): View {
+        if (username.isNullOrEmpty()) return Http404View(call)
+        return withAuth(call) {
+            userRepository.findUserByUsername(username)?.let { user ->
+                ProfileView(call, user)
+            } ?: Http404View(call)
+        }
     }
 
-    override fun updateProfile(call: ApplicationCall): View {
-        TODO("Not yet implemented")
+    override suspend fun updateProfile(call: ApplicationCall, username: String?): View {
+        if (username.isNullOrEmpty()) return Http404View(call)
+        return withAuth(call) { loggedInUser ->
+            userRepository.findUserByUsername(username)?.let { user ->
+                if (user != loggedInUser) {
+                    Http403View(call)
+                } else {
+                    val params = call.receiveParameters()
+                    val result = userRepository.updateUserProfile(loggedInUser, params[PARAM_USERNAME], params[PARAM_PASSWORD], params[PARAM_EMAIL])
+                    val redirUser = if (result is UserRepository.UserUpdateStatus.Success) {
+                        call.sessions.set(SiteSession(authToken = result.user.authToken))
+                        result.user
+                    } else {
+                        user
+                    }
+                    RedirectView(call, getProfileUrl(redirUser.username))
+                }
+            } ?: Http404View(call)
+        }
     }
 }

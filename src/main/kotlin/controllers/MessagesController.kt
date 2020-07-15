@@ -18,26 +18,34 @@ interface MessagesController : WithAuth {
     suspend fun getTopicPage(topicId: Int, call: ApplicationCall): View
     suspend fun postNewTopic(roomId: Int, call: ApplicationCall): View
     suspend fun postNewReply(topicId: Int, call: ApplicationCall): View
+    suspend fun carryOverTopic(topicId: Int, call: ApplicationCall): View
 }
 
 class MessagesControllerImpl(override val userRepository: UserRepository, private val messagesRepository: MessagesRepository) : MessagesController {
     override suspend fun getRoomPage(roomId: Int, call: ApplicationCall): View {
         return withAuth(call) {
-            val messages = messagesRepository.getActiveRoom()?.let {
-                messagesRepository.getTopicsForRoom(it)
-            } ?: emptyList()
+            if (roomId == -1) {
+                return@withAuth Http404View(call)
+            }
+            val messages = messagesRepository.getActiveRoom()?.topics ?: emptyList()
             TopicsView(messages, call)
         }
     }
 
     override suspend fun getTopicPage(topicId: Int, call: ApplicationCall): View {
         return withAuth(call) {
+            if (topicId == -1) {
+                return@withAuth Http404View(call)
+            }
             RepliesView(messagesRepository.getTopicById(topicId)?.replies ?: emptyList(), call)
         }
     }
 
     override suspend fun postNewTopic(roomId: Int, call: ApplicationCall): View {
         return withAuth(call) {
+            if (roomId == -1) {
+                return@withAuth Http404View(call)
+            }
             val params = call.receiveParameters()
             val subject = params[PARAM_SUBJECT]
             val body = params[PARAM_BODY]
@@ -50,10 +58,24 @@ class MessagesControllerImpl(override val userRepository: UserRepository, privat
 
     override suspend fun postNewReply(topicId: Int, call: ApplicationCall): View {
         return withAuth(call) {activeUser ->
+            if (topicId == -1) {
+                return@withAuth Http404View(call)
+            }
             val params = call.receiveParameters()
             params[PARAM_BODY]?.let {
                 messagesRepository.createReply(topicId, it, activeUser)
             }
+            RedirectView(call, getTopicUrl(topicId.toString()))
+        }
+    }
+
+    override suspend fun carryOverTopic(topicId: Int, call: ApplicationCall): View {
+        return withAuth(call) {
+            if (topicId == -1) {
+                return@withAuth Http404View(call)
+            }
+
+            messagesRepository.carryOverTopic(topicId)
             RedirectView(call, getTopicUrl(topicId.toString()))
         }
     }

@@ -11,6 +11,8 @@ import io.ktor.mustache.Mustache
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.cookie
 import repositories.MessagesRepository
 import repositories.MessagesRepositoryImpl
 import repositories.UserRepository
@@ -24,15 +26,18 @@ fun Application.main() {
     val userRepo: UserRepository = UserRepositoryImpl(saltSecret, tokenSecret)
     val messagesRepo: MessagesRepository = MessagesRepositoryImpl(userRepo)
 
-    val homePageController: HomePageController = HomePageControllerImpl()
-    val adminController: AdminController = AdminControllerImpl(userRepo)
-    val loginController: LoginController = LoginControllerImpl()
+    val homePageController: HomePageController = HomePageControllerImpl(userRepo, messagesRepo)
+    val adminController: AdminController = AdminControllerImpl(userRepo, messagesRepo)
+    val loginController: LoginController = LoginControllerImpl(userRepo)
     val messagesController: MessagesController = MessagesControllerImpl(userRepo, messagesRepo)
     val profileController: ProfileController = ProfileControllerImpl(userRepo)
 
     val router: Router = Router(homePageController, messagesController, profileController, loginController, adminController)
     install(DefaultHeaders)
     install(CallLogging)
+    install(Sessions) {
+        cookie<SiteSession>("SESSION_COOKIE")
+    }
     install(Mustache) {
         mustacheFactory = DefaultMustacheFactory("templates")
     }

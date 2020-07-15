@@ -1,7 +1,7 @@
 package repositories
 
-import db.Room
 import models.Reply
+import models.Room
 import models.Topic
 import models.User
 import org.jetbrains.exposed.sql.*
@@ -10,11 +10,14 @@ import java.time.LocalDateTime
 private typealias TopicId = Int
 
 interface MessagesRepository {
-    fun getActiveRoom(): Int?
+    fun getActiveRoom(hydrateTopics: Boolean = true): Room?
+    fun getAllRooms(hydrateTopics: Boolean = false): List<Room>
     fun getTopicsForRoom(id: Int): List<Topic>
     fun getTopicById(id: Int): Topic?
+    fun createRoom(): Room?
     fun createTopic(title: String, body: String, author: User): TopicId?
     fun createReply(parentId: Int, body: String, author: User): TopicId?
+    fun carryOverTopic(topicId: TopicId)
 }
 
 class MessagesRepositoryImpl(private val userRepository: UserRepository) : MessagesRepository {
@@ -22,14 +25,22 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
         DEEP, ABBREVIATED, SHALLOW
     }
 
-    override fun getActiveRoom(): Int? {
+    override fun getActiveRoom(hydrateTopics: Boolean): Room? {
         return db.Room.select { db.Room.isActive eq true }.firstOrNull()?.let {
-            it[db.Room.id].value
+            val roomId = it[db.Room.id].value
+            Room(if (hydrateTopics) getTopicsForRoom(roomId) else emptyList(), it[db.Room.created], roomId)
+        }
+    }
+
+    override fun getAllRooms(hydrateTopics: Boolean): List<Room> {
+        return db.Room.selectAll().map {
+            val roomId = it[db.Room.id].value
+            Room(if (hydrateTopics) getTopicsForRoom(roomId) else emptyList(), it[db.Room.created], roomId)
         }
     }
 
     override fun getTopicsForRoom(id: Int): List<Topic> {
-        return db.Topic.innerJoin(Room).select { db.Room.id eq id }.andWhere { db.Room.id eq db.Topic.room }.map { topicResult ->
+        return db.Topic.innerJoin(db.Room).select { db.Room.id eq id }.andWhere { db.Room.id eq db.Topic.room }.map { topicResult ->
             hydrateTopic(topicResult, TopicHydrationType.ABBREVIATED)
         }
     }
@@ -38,6 +49,23 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
         return db.Topic.select { db.Topic.id eq id }.firstOrNull()?.let {
             hydrateTopic(it, TopicHydrationType.DEEP)
         }
+    }
+
+    override fun createRoom(): Room? {
+        // Only one room can be active at a time, so we want to find the active one and deselect it, if it exists
+        val active = getActiveRoom(false)
+        if (active != null) {
+            db.Room.update({ db.Room.id eq active.id }) {
+                it[db.Room.isActive] = false
+            }
+        }
+        val createdAt = LocalDateTime.now()
+        val isActive = true
+        val id = db.Room.insertAndGetId {
+            it[db.Room.created] = createdAt
+            it[db.Room.isActive] = isActive
+        }.value
+        return Room(emptyList(), createdAt, id)
     }
 
     override fun createTopic(title: String, body: String, author: User): TopicId? {
@@ -63,6 +91,16 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
             it[db.Reply.posted] = LocalDateTime.now()
         }
         return parentId
+    }
+
+    override fun carryOverTopic(topicId: TopicId) {
+        val activeRoom = getActiveRoom(false)
+        if (activeRoom == null) {
+            return
+        }
+        db.Topic.update({ db.Topic.id eq topicId } ){
+            it[db.Topic.room] = activeRoom.id
+        }
     }
 
     private fun hydrateTopic(row: ResultRow, type: TopicHydrationType): Topic {
