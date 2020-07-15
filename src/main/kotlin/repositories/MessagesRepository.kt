@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 private typealias TopicId = Int
 
-interface MessagesRepository {
+interface MessagesRepository : Repository {
     fun getActiveRoom(hydrateTopics: Boolean = true): Room?
     fun getAllRooms(hydrateTopics: Boolean = false): List<Room>
     fun getTopicsForRoom(id: Int): List<Topic>

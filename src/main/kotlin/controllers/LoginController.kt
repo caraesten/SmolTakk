@@ -19,7 +19,7 @@ private const val ERROR_BAD_LOGIN = "badlogin"
 private const val PARAM_EMAIL = "email"
 private const val PARAM_PASSWORD = "password"
 
-interface LoginController {
+interface LoginController : Controller {
     suspend fun getLoginPage(call: ApplicationCall): View
     suspend fun performLogin(call: ApplicationCall): View
 
@@ -30,17 +30,15 @@ interface LoginController {
 
 class LoginControllerImpl(val userRepository: UserRepository) : LoginController {
     override suspend fun getLoginPage(call: ApplicationCall): View {
-        val params = try {
-            call.receiveParameters()
-        } catch (e: ContentTransformationException) { null }
+        val params = call.getParametersOrNull()
         val errorList = params?.get(PARAM_ERRORS)?.split(",") ?: emptyList()
         return LoginView(call, errorList)
     }
 
     override suspend fun performLogin(call: ApplicationCall): View {
-        val params = call.receiveParameters()
-        val email = params[PARAM_EMAIL]
-        val password = params[PARAM_PASSWORD]
+        val params = call.getParametersOrNull()
+        val email = params?.get(PARAM_EMAIL)
+        val password = params?.get(PARAM_PASSWORD)
         if (email.isNullOrEmpty() || password.isNullOrEmpty()) {
             return LoginRedirectView(call, errors = listOf(ERROR_BAD_LOGIN))
         }

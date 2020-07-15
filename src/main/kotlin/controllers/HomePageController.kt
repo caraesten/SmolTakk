@@ -10,16 +10,18 @@ import views.RedirectView
 import views.View
 import web.Router.Companion.getRoomUrl
 
-interface HomePageController : WithAuth {
+interface HomePageController : WithAuth, Controller {
     fun getHomePage(call: ApplicationCall): View
 }
 
 class HomePageControllerImpl(override val userRepository: UserRepository, val messagesRepository: MessagesRepository) : HomePageController {
     override fun getHomePage(call: ApplicationCall): View {
         return getLoggedInUser(call)?.let {
-            messagesRepository.getActiveRoom()?.let { room ->
-                RedirectView(call, getRoomUrl(room.id))
-            } ?: Http404View(call)
+            withTransaction(messagesRepository) {
+                messagesRepository.getActiveRoom()?.let { room ->
+                    RedirectView(call, getRoomUrl(room.id))
+                } ?: Http404View(call)
+            }
         } ?: LoginRedirectView(call)
     }
 }

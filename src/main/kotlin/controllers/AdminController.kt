@@ -19,7 +19,7 @@ private const val PARAM_USERNAME = "username"
 private const val PARAM_EMAIL = "email"
 private const val PARAM_PASSWORD = "password"
 
-interface AdminController : WithAuth {
+interface AdminController : WithAuth, Controller {
     suspend fun showUserAdminPage(call: ApplicationCall): View
     suspend fun showRoomAdminPage(call: ApplicationCall): View
     suspend fun createUser(call: ApplicationCall): View
@@ -29,28 +29,32 @@ interface AdminController : WithAuth {
 class AdminControllerImpl(override val userRepository: UserRepository, val messagesRepository: MessagesRepository) : AdminController {
     override suspend fun showUserAdminPage(call: ApplicationCall): View {
         return withAdminAuth(call) {
-            val users = userRepository.getAllUsers()
-            UsersView(call, users)
+            withTransaction(userRepository) {
+                val users = userRepository.getAllUsers()
+                UsersView(call, users)
+            }
         }
     }
 
     override suspend fun showRoomAdminPage(call: ApplicationCall): View {
         return withAdminAuth(call) {
-            val rooms = messagesRepository.getAllRooms(true)
-            RoomsView(call, rooms)
+            withTransaction(messagesRepository) {
+                val rooms = messagesRepository.getAllRooms(true)
+                RoomsView(call, rooms)
+            }
         }
     }
 
     override suspend fun createUser(call: ApplicationCall): View {
         return withAdminAuth(call) {
-            val params = call.receiveParameters()
-            val email = params[PARAM_EMAIL]
-            val username = params[PARAM_USERNAME]
-            val password = params[PARAM_PASSWORD]
+            val params = call.getParametersOrNull()
+            val email = params?.get(PARAM_EMAIL)
+            val username = params?.get(PARAM_USERNAME)
+            val password = params?.get(PARAM_PASSWORD)
             if (email.isNullOrEmpty() || username.isNullOrEmpty() || password.isNullOrEmpty()) {
                 RedirectView(call, "")
             } else {
-                val user = userRepository.createUser(email, username, password)
+                val user = withTransaction(userRepository) { userRepository.createUser(email, username, password) }
                 RedirectView(call, if (user != null) getProfileUrl(user.username) else "")
             }
         }
@@ -58,7 +62,9 @@ class AdminControllerImpl(override val userRepository: UserRepository, val messa
 
     override suspend fun createRoom(call: ApplicationCall): View {
         return withAdminAuth(call) {
-            messagesRepository.createRoom()
+            withTransaction(messagesRepository) {
+                messagesRepository.createRoom()
+            }
             RedirectView(call, "")
         }
     }

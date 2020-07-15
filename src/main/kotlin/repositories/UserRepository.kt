@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.*
 import util.hashSha512
 import java.time.LocalDateTime
 
-interface UserRepository {
+interface UserRepository : Repository {
     sealed class UserUpdateStatus() {
         class Success(val user: User) : UserUpdateStatus()
         abstract class Failure : UserUpdateStatus()

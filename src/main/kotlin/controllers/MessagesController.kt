@@ -13,7 +13,7 @@ import web.Router.Companion.getTopicUrl
 private const val PARAM_SUBJECT = "subject"
 private const val PARAM_BODY = "body"
 
-interface MessagesController : WithAuth {
+interface MessagesController : WithAuth, Controller {
     suspend fun getRoomPage(roomId: Int, call: ApplicationCall): View
     suspend fun getTopicPage(topicId: Int, call: ApplicationCall): View
     suspend fun postNewTopic(roomId: Int, call: ApplicationCall): View
@@ -27,7 +27,9 @@ class MessagesControllerImpl(override val userRepository: UserRepository, privat
             if (roomId == -1) {
                 return@withAuth Http404View(call)
             }
-            val messages = messagesRepository.getActiveRoom()?.topics ?: emptyList()
+            val messages = withTransaction(messagesRepository) {
+                messagesRepository.getActiveRoom()?.topics ?: emptyList()
+            }
             TopicsView(messages, call)
         }
     }
@@ -37,7 +39,10 @@ class MessagesControllerImpl(override val userRepository: UserRepository, privat
             if (topicId == -1) {
                 return@withAuth Http404View(call)
             }
-            RepliesView(messagesRepository.getTopicById(topicId)?.replies ?: emptyList(), call)
+            val replies = withTransaction(messagesRepository) {
+                messagesRepository.getTopicById(topicId)?.replies ?: emptyList()
+            }
+            RepliesView(replies, call)
         }
     }
 
@@ -46,11 +51,13 @@ class MessagesControllerImpl(override val userRepository: UserRepository, privat
             if (roomId == -1) {
                 return@withAuth Http404View(call)
             }
-            val params = call.receiveParameters()
-            val subject = params[PARAM_SUBJECT]
-            val body = params[PARAM_BODY]
+            val params = call.getParametersOrNull()
+            val subject = params?.get(PARAM_SUBJECT)
+            val body = params?.get(PARAM_BODY)
             val topicId = if (!subject.isNullOrEmpty() && !body.isNullOrEmpty()) {
-                messagesRepository.createTopic(params[PARAM_SUBJECT]!!, params[PARAM_BODY]!!, it).toString()
+                withTransaction(messagesRepository) {
+                    messagesRepository.createTopic(params[PARAM_SUBJECT]!!, params[PARAM_BODY]!!, it).toString()
+                }
             } else ""
             RedirectView(call, getTopicUrl(topicId))
         }
@@ -61,9 +68,11 @@ class MessagesControllerImpl(override val userRepository: UserRepository, privat
             if (topicId == -1) {
                 return@withAuth Http404View(call)
             }
-            val params = call.receiveParameters()
-            params[PARAM_BODY]?.let {
-                messagesRepository.createReply(topicId, it, activeUser)
+            val params = call.getParametersOrNull()
+            params?.get(PARAM_BODY)?.let {
+                withTransaction(messagesRepository) {
+                    messagesRepository.createReply(topicId, it, activeUser)
+                }
             }
             RedirectView(call, getTopicUrl(topicId.toString()))
         }
@@ -74,8 +83,9 @@ class MessagesControllerImpl(override val userRepository: UserRepository, privat
             if (topicId == -1) {
                 return@withAuth Http404View(call)
             }
-
-            messagesRepository.carryOverTopic(topicId)
+            withTransaction(messagesRepository) {
+                messagesRepository.carryOverTopic(topicId)
+            }
             RedirectView(call, getTopicUrl(topicId.toString()))
         }
     }
