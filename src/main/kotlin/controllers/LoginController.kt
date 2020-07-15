@@ -2,6 +2,7 @@ package controllers
 
 import controllers.LoginController.Companion.PARAM_ERRORS
 import io.ktor.application.ApplicationCall
+import io.ktor.request.ContentTransformationException
 import io.ktor.request.receiveParameters
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
@@ -29,8 +30,10 @@ interface LoginController {
 
 class LoginControllerImpl(val userRepository: UserRepository) : LoginController {
     override suspend fun getLoginPage(call: ApplicationCall): View {
-        val params = call.receiveParameters()
-        val errorList = params[PARAM_ERRORS]?.split(",") ?: emptyList()
+        val params = try {
+            call.receiveParameters()
+        } catch (e: ContentTransformationException) { null }
+        val errorList = params?.get(PARAM_ERRORS)?.split(",") ?: emptyList()
         return LoginView(call, errorList)
     }
 

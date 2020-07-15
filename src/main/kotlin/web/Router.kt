@@ -2,6 +2,8 @@ package web
 
 import controllers.*
 import io.ktor.application.call
+import io.ktor.http.content.resources
+import io.ktor.http.content.static
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
@@ -60,6 +62,10 @@ class Router(
             }
             post("/admin/rooms/new") {
                 adminController.createRoom(call).render()
+            }
+
+            static("static") {
+                resources("css")
             }
         }
     }
