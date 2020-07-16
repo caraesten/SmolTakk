@@ -1,12 +1,10 @@
 package controllers
 
+import com.smoltakk.repositories.UserRepository
 import controllers.LoginController.Companion.PARAM_ERRORS
 import io.ktor.application.ApplicationCall
-import io.ktor.request.ContentTransformationException
-import io.ktor.request.receiveParameters
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
-import repositories.UserRepository
 import views.LoginRedirectView
 import views.LoginView
 import views.RedirectView

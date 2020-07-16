@@ -1,9 +1,9 @@
-package repositories
+package com.smoltakk.repositories
 
-import models.Reply
-import models.Room
-import models.Topic
-import models.User
+import com.smoltakk.models.Reply
+import com.smoltakk.models.Room
+import com.smoltakk.models.Topic
+import com.smoltakk.models.User
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 import com.smoltakk.db.Reply as DbReply
@@ -23,7 +23,8 @@ interface MessagesRepository : Repository {
     fun carryOverTopic(topicId: TopicId)
 }
 
-class MessagesRepositoryImpl(override val database: Database, private val userRepository: UserRepository) : MessagesRepository {
+class MessagesRepositoryImpl(override val database: Database, private val userRepository: UserRepository) :
+    MessagesRepository {
     private enum class TopicHydrationType {
         DEEP, ABBREVIATED, SHALLOW
     }
@@ -44,13 +45,17 @@ class MessagesRepositoryImpl(override val database: Database, private val userRe
 
     override fun getTopicsForRoom(id: Int): List<Topic> {
         return DbTopic.innerJoin(DbRoom).select { DbRoom.id eq id }.andWhere { DbRoom.id eq DbTopic.room }.map { topicResult ->
-            hydrateTopic(topicResult, TopicHydrationType.ABBREVIATED)
+            hydrateTopic(topicResult,
+                TopicHydrationType.ABBREVIATED
+            )
         }
     }
 
     override fun getTopicById(id: TopicId): Topic? {
         return DbTopic.select { DbTopic.id eq id }.firstOrNull()?.let {
-            hydrateTopic(it, TopicHydrationType.DEEP)
+            hydrateTopic(it,
+                TopicHydrationType.DEEP
+            )
         }
     }
 

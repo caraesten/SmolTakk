@@ -1,13 +1,10 @@
 package controllers
 
+import com.smoltakk.repositories.MessagesRepository
+import com.smoltakk.repositories.UserRepository
 import controllers.mixins.WithAuth
 import io.ktor.application.ApplicationCall
-import io.ktor.request.receiveParameters
-import repositories.MessagesRepository
-import repositories.UserRepository
 import views.*
-import views.viewmodels.Messages
-import web.Router
 import web.Router.Companion.getTopicUrl
 
 private const val PARAM_SUBJECT = "subject"

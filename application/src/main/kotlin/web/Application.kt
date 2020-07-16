@@ -11,10 +11,10 @@ import io.ktor.mustache.Mustache
 import io.ktor.routing.Routing
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
-import repositories.MessagesRepository
-import repositories.MessagesRepositoryImpl
-import repositories.UserRepository
-import repositories.UserRepositoryImpl
+import com.smoltakk.repositories.MessagesRepository
+import com.smoltakk.repositories.MessagesRepositoryImpl
+import com.smoltakk.repositories.UserRepository
+import com.smoltakk.repositories.UserRepositoryImpl
 
 fun Application.main() {
     // TODO: Move to DI
@@ -25,6 +25,7 @@ fun Application.main() {
     val dbUser = this.environment.config.propertyOrNull("ktor.db.jdbcUser")?.getString()!!
     val dbPassword = this.environment.config.propertyOrNull("ktor.db.jdbcPassword")?.getString()!!
 
+    // db shouldn't be a dependency of application, but until I get a nicer DI setup for some indirection, it has to be
     val database = DatabaseFactory(dbUrl, dbUser, dbPassword).init()
 
     val userRepo: UserRepository = UserRepositoryImpl(database, saltSecret, tokenSecret)

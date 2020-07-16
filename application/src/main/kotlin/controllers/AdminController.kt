@@ -1,17 +1,15 @@
 package controllers
 
+import com.smoltakk.models.User
+import com.smoltakk.repositories.MessagesRepository
+import com.smoltakk.repositories.UserRepository
 import controllers.mixins.WithAuth
 import io.ktor.application.ApplicationCall
-import io.ktor.request.receiveParameters
-import models.User
-import repositories.MessagesRepository
-import repositories.UserRepository
 import views.Http403View
 import views.RedirectView
 import views.View
 import views.admin.RoomsView
 import views.admin.UsersView
-import web.Router.Companion.ROOM_URL
 import web.Router.Companion.getProfileUrl
 
 private const val CARAS_EMAIL = "dondeesten@gmail.com" // lol I'm lazy sorry

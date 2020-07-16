@@ -4,7 +4,7 @@ import io.ktor.application.ApplicationCall
 import io.ktor.http.Parameters
 import io.ktor.request.ContentTransformationException
 import io.ktor.request.receiveParameters
-import repositories.Repository
+import com.smoltakk.repositories.Repository
 
 interface Controller {
     fun <T> withTransaction(repo: Repository, block: () -> T): T {

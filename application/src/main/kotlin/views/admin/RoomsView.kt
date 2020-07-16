@@ -1,7 +1,7 @@
 package views.admin
 
 import io.ktor.application.ApplicationCall
-import models.Room
+import com.smoltakk.models.Room
 import views.MustacheView
 import views.admin.viewmodels.Rooms
 

@@ -18,7 +18,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:0.26.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.26.1")
     implementation("org.jetbrains.exposed:exposed-java-time:0.26.1")
+    implementation(project(":repositories"))
     implementation(project(":database"))
+    implementation(project(":models"))
 }
 
 tasks {

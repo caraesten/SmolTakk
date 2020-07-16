@@ -1,4 +1,4 @@
-package models
+package com.smoltakk.models
 
 data class User(
     val email: String,
@@ -7,6 +7,7 @@ data class User(
     val id: Int) {
 
     companion object {
-        fun getEmptyUser(): User = User("", "", "", -1)
+        fun getEmptyUser(): User =
+            User("", "", "", -1)
     }
 }

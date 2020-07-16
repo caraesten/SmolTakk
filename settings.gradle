@@ -3,4 +3,6 @@ include 'database'
 include 'application'
 include 'scriptTools'
 include 'scripts'
+include 'repositories'
+include 'models'
 

@@ -1,10 +1,8 @@
 package views.admin
 
+import com.smoltakk.models.User
 import io.ktor.application.ApplicationCall
-import models.Room
-import models.User
 import views.MustacheView
-import views.admin.viewmodels.Rooms
 import views.admin.viewmodels.Users
 
 class UsersView(call: ApplicationCall, users: List<User>) : MustacheView<Users>(call) {

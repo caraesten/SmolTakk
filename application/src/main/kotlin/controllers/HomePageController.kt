@@ -2,8 +2,8 @@ package controllers
 
 import controllers.mixins.WithAuth
 import io.ktor.application.ApplicationCall
-import repositories.MessagesRepository
-import repositories.UserRepository
+import com.smoltakk.repositories.MessagesRepository
+import com.smoltakk.repositories.UserRepository
 import views.Http404View
 import views.LoginRedirectView
 import views.RedirectView

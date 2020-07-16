@@ -1,12 +1,11 @@
 package controllers.mixins
 
-import constants.AppConstants
 import controllers.Controller
 import io.ktor.application.ApplicationCall
 import io.ktor.sessions.sessions
 import io.ktor.sessions.get
-import models.User
-import repositories.UserRepository
+import com.smoltakk.models.User
+import com.smoltakk.repositories.UserRepository
 import views.LoginRedirectView
 import views.View
 import web.SiteSession

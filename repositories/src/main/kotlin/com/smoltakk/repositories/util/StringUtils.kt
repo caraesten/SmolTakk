@@ -1,4 +1,4 @@
-package util
+package com.smoltakk.repositories.util
 
 import java.security.MessageDigest
 

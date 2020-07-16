@@ -1,4 +1,4 @@
-package repositories
+package com.smoltakk.repositories
 
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction

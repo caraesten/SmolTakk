@@ -5,7 +5,7 @@ import io.ktor.application.ApplicationCall
 import io.ktor.request.receiveParameters
 import io.ktor.sessions.sessions
 import io.ktor.sessions.set
-import repositories.UserRepository
+import com.smoltakk.repositories.UserRepository
 import views.*
 import web.Router.Companion.getProfileUrl
 import web.SiteSession
