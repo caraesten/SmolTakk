@@ -1,10 +1,12 @@
 package repositories
 
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface Repository {
+    val database: Database
     fun <T> withTransaction(block: () -> T): T {
-        return transaction {
+        return transaction(database) {
             block()
         }
     }

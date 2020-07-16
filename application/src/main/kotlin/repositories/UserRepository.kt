@@ -1,5 +1,6 @@
 package repositories
 
+import com.smoltakk.db.User as DbUser
 import models.User
 import org.jetbrains.exposed.sql.*
 import util.hashSha512
@@ -22,9 +23,9 @@ interface UserRepository : Repository {
     fun updateUserProfile(user: User, username: String?, password: String?, email: String?): UserUpdateStatus
 }
 
-class UserRepositoryImpl(private val saltSecret: String, private val tokenSecret: String) : UserRepository {
+class UserRepositoryImpl(override val database: Database, private val saltSecret: String, private val tokenSecret: String) : UserRepository {
     override fun createUser(newUserEmail: String, newUserUsername: String, newUserPassword: String): User? {
-        val id = db.User.insertAndGetId {
+        val id = DbUser.insertAndGetId {
             val timestamp = System.currentTimeMillis().toString()
 
             it[username] = newUserUsername
@@ -39,12 +40,12 @@ class UserRepositoryImpl(private val saltSecret: String, private val tokenSecret
     }
 
     override fun loginUser(email: String, password: String): User? {
-        val obj = db.User.select { db.User.email eq email }.firstOrNull()
+        val obj = DbUser.select { DbUser.email eq email }.firstOrNull()
         return obj?.let { row ->
-            if (row[db.User.hashedPassword] == (password + saltSecret).hashSha512()) {
+            if (row[DbUser.hashedPassword] == (password + saltSecret).hashSha512()) {
                 val user = hydrateUser(row)
                 val newToken = generateToken(user.username, System.currentTimeMillis().toString())
-                db.User.update ({ db.User.email eq user.email}) {
+                DbUser.update ({ DbUser.email eq user.email}) {
                     it[authToken] = newToken
                     it[tokenIssued] = LocalDateTime.now()
                 }
@@ -54,20 +55,20 @@ class UserRepositoryImpl(private val saltSecret: String, private val tokenSecret
     }
 
     override fun getAllUsers(): List<User> {
-        return db.User.selectAll().map(::hydrateUser)
+        return DbUser.selectAll().map(::hydrateUser)
     }
 
     override fun findUserById(id: Int): User? {
-        val obj = db.User.select { db.User.id eq id }.firstOrNull()
+        val obj = DbUser.select { DbUser.id eq id }.firstOrNull()
         return obj?.let (::hydrateUser)
     }
 
     override fun findUserByUsername(username: String): User? {
-        val obj = db.User.select { db.User.username eq username }.firstOrNull()
+        val obj = DbUser.select { DbUser.username eq username }.firstOrNull()
         return obj?.let (::hydrateUser)
     }
 
-    override fun findUserByAuthToken(authToken: String) = db.User.select { db.User.authToken eq authToken }.firstOrNull()?.let(::hydrateUser)
+    override fun findUserByAuthToken(authToken: String) = DbUser.select { DbUser.authToken eq authToken }.firstOrNull()?.let(::hydrateUser)
 
     override fun updateUserProfile(
         user: User,
@@ -96,13 +97,13 @@ class UserRepositoryImpl(private val saltSecret: String, private val tokenSecret
 
         val newUser = intermediateUser.copy(authToken = newToken)
 
-        val result = db.User.update({db.User.id eq user.id }) { dbUser ->
-            dbUser[db.User.username] = newUser.username
-            dbUser[db.User.email] = newUser.email
+        val result = DbUser.update({DbUser.id eq user.id }) { dbUser ->
+            dbUser[DbUser.username] = newUser.username
+            dbUser[DbUser.email] = newUser.email
             if (!hashedPassword.isNullOrEmpty()) {
-                dbUser[db.User.hashedPassword] = hashedPassword
-                dbUser[db.User.authToken] = newToken
-                dbUser[db.User.tokenIssued] = LocalDateTime.now()
+                dbUser[DbUser.hashedPassword] = hashedPassword
+                dbUser[DbUser.authToken] = newToken
+                dbUser[DbUser.tokenIssued] = LocalDateTime.now()
             }
         }
 
@@ -111,10 +112,10 @@ class UserRepositoryImpl(private val saltSecret: String, private val tokenSecret
 
     private fun hydrateUser(row: ResultRow): User {
         return User(
-            username = row[db.User.username],
-            email = row[db.User.email],
-            authToken = row[db.User.authToken],
-            id = row[db.User.id].value
+            username = row[DbUser.username],
+            email = row[DbUser.email],
+            authToken = row[DbUser.authToken],
+            id = row[DbUser.id].value
         )
     }
 

@@ -1,2 +1,6 @@
 rootProject.name = 'SmolTakk'
+include 'database'
+include 'application'
+include 'scriptTools'
+include 'scripts'
 

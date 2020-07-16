@@ -1,16 +1,14 @@
 package web
 
 import com.github.mustachejava.DefaultMustacheFactory
+import com.smoltakk.db.DatabaseFactory
 import controllers.*
 import io.ktor.application.Application
-import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.DefaultHeaders
 import io.ktor.mustache.Mustache
 import io.ktor.routing.Routing
-import io.ktor.routing.get
-import io.ktor.routing.post
 import io.ktor.sessions.Sessions
 import io.ktor.sessions.cookie
 import repositories.MessagesRepository
@@ -23,8 +21,14 @@ fun Application.main() {
     val saltSecret = this.environment.config.propertyOrNull("ktor.application.saltSecret")?.getString() ?: ""
     val tokenSecret = this.environment.config.propertyOrNull("ktor.application.tokenSecret")?.getString() ?: ""
 
-    val userRepo: UserRepository = UserRepositoryImpl(saltSecret, tokenSecret)
-    val messagesRepo: MessagesRepository = MessagesRepositoryImpl(userRepo)
+    val dbUrl = this.environment.config.propertyOrNull("ktor.db.jdbcUrl")?.getString()!!
+    val dbUser = this.environment.config.propertyOrNull("ktor.db.jdbcUser")?.getString()!!
+    val dbPassword = this.environment.config.propertyOrNull("ktor.db.jdbcPassword")?.getString()!!
+
+    val database = DatabaseFactory(dbUrl, dbUser, dbPassword).init()
+
+    val userRepo: UserRepository = UserRepositoryImpl(database, saltSecret, tokenSecret)
+    val messagesRepo: MessagesRepository = MessagesRepositoryImpl(database, userRepo)
 
     val homePageController: HomePageController = HomePageControllerImpl(userRepo, messagesRepo)
     val adminController: AdminController = AdminControllerImpl(userRepo, messagesRepo)

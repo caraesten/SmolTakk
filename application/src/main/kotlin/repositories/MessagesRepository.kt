@@ -6,6 +6,9 @@ import models.Topic
 import models.User
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
+import com.smoltakk.db.Reply as DbReply
+import com.smoltakk.db.Room as DbRoom
+import com.smoltakk.db.Topic as DbTopic
 
 private typealias TopicId = Int
 
@@ -20,33 +23,33 @@ interface MessagesRepository : Repository {
     fun carryOverTopic(topicId: TopicId)
 }
 
-class MessagesRepositoryImpl(private val userRepository: UserRepository) : MessagesRepository {
+class MessagesRepositoryImpl(override val database: Database, private val userRepository: UserRepository) : MessagesRepository {
     private enum class TopicHydrationType {
         DEEP, ABBREVIATED, SHALLOW
     }
 
     override fun getActiveRoom(hydrateTopics: Boolean): Room? {
-        return db.Room.select { db.Room.isActive eq true }.firstOrNull()?.let {
-            val roomId = it[db.Room.id].value
-            Room(if (hydrateTopics) getTopicsForRoom(roomId) else emptyList(), it[db.Room.created], roomId)
+        return DbRoom.select { DbRoom.isActive eq true }.firstOrNull()?.let {
+            val roomId = it[DbRoom.id].value
+            Room(if (hydrateTopics) getTopicsForRoom(roomId) else emptyList(), it[DbRoom.created], roomId)
         }
     }
 
     override fun getAllRooms(hydrateTopics: Boolean): List<Room> {
-        return db.Room.selectAll().map {
-            val roomId = it[db.Room.id].value
-            Room(if (hydrateTopics) getTopicsForRoom(roomId) else emptyList(), it[db.Room.created], roomId)
+        return DbRoom.selectAll().map {
+            val roomId = it[DbRoom.id].value
+            Room(if (hydrateTopics) getTopicsForRoom(roomId) else emptyList(), it[DbRoom.created], roomId)
         }
     }
 
     override fun getTopicsForRoom(id: Int): List<Topic> {
-        return db.Topic.innerJoin(db.Room).select { db.Room.id eq id }.andWhere { db.Room.id eq db.Topic.room }.map { topicResult ->
+        return DbTopic.innerJoin(DbRoom).select { DbRoom.id eq id }.andWhere { DbRoom.id eq DbTopic.room }.map { topicResult ->
             hydrateTopic(topicResult, TopicHydrationType.ABBREVIATED)
         }
     }
 
     override fun getTopicById(id: TopicId): Topic? {
-        return db.Topic.select { db.Topic.id eq id }.firstOrNull()?.let {
+        return DbTopic.select { DbTopic.id eq id }.firstOrNull()?.let {
             hydrateTopic(it, TopicHydrationType.DEEP)
         }
     }
@@ -55,40 +58,40 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
         // Only one room can be active at a time, so we want to find the active one and deselect it, if it exists
         val active = getActiveRoom(false)
         if (active != null) {
-            db.Room.update({ db.Room.id eq active.id }) {
-                it[db.Room.isActive] = false
+            DbRoom.update({ DbRoom.id eq active.id }) {
+                it[DbRoom.isActive] = false
             }
         }
         val createdAt = LocalDateTime.now()
         val isActive = true
-        val id = db.Room.insertAndGetId {
-            it[db.Room.created] = createdAt
-            it[db.Room.isActive] = isActive
+        val id = DbRoom.insertAndGetId {
+            it[DbRoom.created] = createdAt
+            it[DbRoom.isActive] = isActive
         }.value
         return Room(emptyList(), createdAt, id)
     }
 
     override fun createTopic(title: String, body: String, author: User): TopicId? {
-        val activeRoom = db.Room.select { db.Room.isActive eq true }.firstOrNull()
+        val activeRoom = DbRoom.select { DbRoom.isActive eq true }.firstOrNull()
         return activeRoom?.let { roomRow ->
-            val roomId = roomRow[db.Room.id]
-            db.Topic.insertAndGetId {
-                it[db.Topic.room] = roomId.value
-                it[db.Topic.author] = author.id
-                it[db.Topic.title] = title
-                it[db.Topic.body] = body
-                it[db.Topic.posted] = LocalDateTime.now()
+            val roomId = roomRow[DbRoom.id]
+            DbTopic.insertAndGetId {
+                it[DbTopic.room] = roomId.value
+                it[DbTopic.author] = author.id
+                it[DbTopic.title] = title
+                it[DbTopic.body] = body
+                it[DbTopic.posted] = LocalDateTime.now()
             }.value
         }
     }
 
     override fun createReply(parentId: TopicId, body: String, author: User): TopicId? {
         // TODO: Check if topic exists + belongs to an active room before allowing the reply
-        db.Reply.insertAndGetId {
-            it[db.Reply.parent] = parentId
-            it[db.Reply.author] = author.id
-            it[db.Reply.body] = body
-            it[db.Reply.posted] = LocalDateTime.now()
+        DbReply.insertAndGetId {
+            it[DbReply.parent] = parentId
+            it[DbReply.author] = author.id
+            it[DbReply.body] = body
+            it[DbReply.posted] = LocalDateTime.now()
         }
         return parentId
     }
@@ -98,19 +101,19 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
         if (activeRoom == null) {
             return
         }
-        db.Topic.update({ db.Topic.id eq topicId } ){
-            it[db.Topic.room] = activeRoom.id
+        DbTopic.update({ DbTopic.id eq topicId } ){
+            it[DbTopic.room] = activeRoom.id
         }
     }
 
     private fun hydrateTopic(row: ResultRow, type: TopicHydrationType): Topic {
-        val topicId = row[db.Topic.id].value
+        val topicId = row[DbTopic.id].value
         val topicQuery = when (type) {
             TopicHydrationType.DEEP -> {
-                db.Reply.select { db.Reply.parent eq topicId}.orderBy(db.Reply.posted to SortOrder.DESC)
+                DbReply.select { DbReply.parent eq topicId}.orderBy(DbReply.posted to SortOrder.DESC)
             }
             TopicHydrationType.ABBREVIATED -> {
-                db.Reply.select { db.Reply.parent eq topicId}.orderBy(db.Reply.posted to SortOrder.DESC).limit(3)
+                DbReply.select { DbReply.parent eq topicId}.orderBy(DbReply.posted to SortOrder.DESC).limit(3)
             }
             TopicHydrationType.SHALLOW -> {
                 null
@@ -118,10 +121,10 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
         }
         // Construct two topics: the base level topic, for the replies, and the one that contains the replies
         val topic = Topic(
-            title = row[db.Topic.title],
-            body = row[db.Topic.body],
-            posted = row[db.Topic.posted],
-            author = userRepository.findUserById(row[db.Topic.author]) ?: User.getEmptyUser(),
+            title = row[DbTopic.title],
+            body = row[DbTopic.body],
+            posted = row[DbTopic.posted],
+            author = userRepository.findUserById(row[DbTopic.author]) ?: User.getEmptyUser(),
             // TODO: Clean up and optimize these queries!!!
             replies = emptyList())
         return topic.copy(replies = topicQuery?.let {
@@ -131,9 +134,9 @@ class MessagesRepositoryImpl(private val userRepository: UserRepository) : Messa
 
     private fun hydrateReply(row: ResultRow, topic: Topic): Reply {
         return Reply(
-            author = userRepository.findUserById(row[db.Reply.author]) ?: User.getEmptyUser(),
-            body = row[db.Reply.body],
-            posted = row[db.Reply.posted],
+            author = userRepository.findUserById(row[DbReply.author]) ?: User.getEmptyUser(),
+            body = row[DbReply.body],
+            posted = row[DbReply.posted],
             topic = topic
         )
     }

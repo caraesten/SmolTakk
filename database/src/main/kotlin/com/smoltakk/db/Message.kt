@@ -1,4 +1,4 @@
-package db
+package com.smoltakk.db
 
 import org.jetbrains.exposed.sql.Column
 import java.time.LocalDateTime
