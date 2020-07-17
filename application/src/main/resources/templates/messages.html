@@ -2,9 +2,16 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Title</title>
+    <title>T A L K</title>
 </head>
 <body>
-
+    <div class="content">
+        {{ #firstTwoMessages }}
+            <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics">
+                {{ #isTopics }}<h3>{{subject}}</h3> {{ /isTopics }}
+                <p>{{text}}</p>
+            </div>
+        {{ /firstTwoMessages }}
+    </div>
 </body>
 </html>

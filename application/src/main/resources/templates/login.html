@@ -8,6 +8,13 @@
 <body>
     <div id="login-body">
         <h3>Login</h3>
+        <form action="{{ loginFormAction }}" method="post">
+            <label for="email">email</label>
+            <input type="text" id="email" name="email" /><br/>
+            <label for="password">password</label>
+            <input type="password" id="password" name="password" /><br/>
+            <input type="submit" />
+        </form>
     </div>
 </body>
 </html>

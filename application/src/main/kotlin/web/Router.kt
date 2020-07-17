@@ -57,10 +57,10 @@ class Router(
             get("/admin/rooms") {
                 adminController.showRoomAdminPage(call).render()
             }
-            post("/admin/users/new") {
+            post() {
                 adminController.createUser(call).render()
             }
-            post("/admin/rooms/new") {
+            post(ADMIN_NEW_ROOM_PATH) {
                 adminController.createRoom(call).render()
             }
 
@@ -75,6 +75,8 @@ class Router(
         const val ROOM_URL = "/"
         const val TOPIC_URL = "/topic/"
         const val PROFILE_URL = "/profile/"
+        const val ADMIN_NEW_ROOM_PATH = "/admin/rooms/new"
+        const val ADMIN_NEW_USER_PATH = "/admin/users/new"
 
         fun getTopicUrl(topicId: String) = "$TOPIC_URL$topicId"
         fun getRoomUrl(roomId: Int) = "$ROOM_URL$roomId"

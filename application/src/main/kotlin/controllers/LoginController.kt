@@ -40,9 +40,11 @@ class LoginControllerImpl(val userRepository: UserRepository) : LoginController 
         if (email.isNullOrEmpty() || password.isNullOrEmpty()) {
             return LoginRedirectView(call, errors = listOf(ERROR_BAD_LOGIN))
         }
-        return userRepository.loginUser(email, password)?.let {
-            call.sessions.set(SiteSession(authToken = it.authToken))
-            RedirectView(call, ROOM_URL)
-        } ?: LoginRedirectView(call, errors = listOf(ERROR_BAD_LOGIN))
+        return withTransaction(userRepository) {
+            userRepository.loginUser(email, password)?.let {
+                call.sessions.set(SiteSession(authToken = it.authToken))
+                RedirectView(call, ROOM_URL)
+            } ?: LoginRedirectView(call, errors = listOf(ERROR_BAD_LOGIN))
+        }
     }
 }

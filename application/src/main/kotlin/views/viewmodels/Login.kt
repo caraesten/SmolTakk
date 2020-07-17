@@ -1,3 +1,7 @@
 package views.viewmodels
 
-data class Login(val errors: List<String>)
+import web.Router
+
+data class Login(val errors: List<String>) {
+    val loginFormAction = Router.LOGIN_URL
+}

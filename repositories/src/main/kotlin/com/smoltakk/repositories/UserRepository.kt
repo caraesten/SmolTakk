@@ -43,7 +43,8 @@ class UserRepositoryImpl(override val database: Database, private val saltSecret
     override fun loginUser(email: String, password: String): User? {
         val obj = DbUser.select { DbUser.email eq email }.firstOrNull()
         return obj?.let { row ->
-            if (row[DbUser.hashedPassword] == (password + saltSecret).hashSha512()) {
+            val salt = row[DbUser.salt]
+            if (row[DbUser.hashedPassword] == generateHashedPassword(salt, password)) {
                 val user = hydrateUser(row)
                 val newToken = generateToken(user.username, System.currentTimeMillis().toString())
                 DbUser.update ({ DbUser.email eq user.email}) {
