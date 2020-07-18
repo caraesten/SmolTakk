@@ -6,12 +6,56 @@
 </head>
 <body>
     <div class="content">
-        {{ #firstTwoMessages }}
-            <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics">
-                {{ #isTopics }}<h3>{{subject}}</h3> {{ /isTopics }}
-                <p>{{text}}</p>
+        <div class="site-header">
+            <p>
+                Logged in as {{activeUser.username}}
+            </p>
+            <p>
+                This site will self destruct in {{roomTtlDays}} days, {{roomTtlHours}} hours, {{roomTtlMinutes}} minutes.
+            </p>
+        </div>
+        {{#header}}
+            <div class="message header topic">
+                <h3>{{title}}</h3>
+                <p>{{body}}</p>
+                <p>{{replyCount}} replies</p>
             </div>
-        {{ /firstTwoMessages }}
+        {{/header}}
+        {{#firstTwoMessages}}
+            <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
+                {{#isTopics}}<h3>{{title}}</h3> {{/isTopics}}
+                <p>{{body}}</p>
+                {{#isTopics}}<p>{{replyCount}} replies</p>{{/isTopics}}
+            </div>
+        {{/firstTwoMessages}}
+        {{#isTopics}}
+            <div class="composer">
+                <form action="{{postTopic}}" method="post">
+                    <label for="subject">Title: </label>
+                    <input type="text" id="subject" name="subject" />
+                    <label for="body">Message: </label>
+                    <textarea rows="4" cols="6" name="body" id="body"></textarea>
+                    <input type="submit" />
+                </form>
+            </div>
+        {{/isTopics}}
+        {{#remainingMessages}}
+            <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
+                {{#isTopics}}<h3>{{title}}</h3> {{/isTopics}}
+                <p>{{body}}</p>
+                {{#isTopics}}<p> {{ replyCount }} replies</p>{{/isTopics}}
+            </div>
+        {{/remainingMessages}}
+
+        {{#isReplies}}
+        <div class="composer">
+            <form action="{{postReply}}" method="post">
+                <label for="body">Reply: </label>
+                <textarea rows="4" cols="6" name="body" id="body"></textarea>
+                <input type="submit" />
+            </form>
+        </div>
+        {{/isReplies}}
     </div>
 </body>
 </html>

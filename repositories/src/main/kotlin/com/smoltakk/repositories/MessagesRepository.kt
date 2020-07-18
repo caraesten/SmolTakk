@@ -124,14 +124,17 @@ class MessagesRepositoryImpl(override val database: Database, private val userRe
                 null
             }
         }
+        val replyCount = DbReply.select { DbReply.parent eq topicId }.count().toInt()
         // Construct two topics: the base level topic, for the replies, and the one that contains the replies
         val topic = Topic(
             title = row[DbTopic.title],
+            id = row[DbTopic.id].value,
             body = row[DbTopic.body],
             posted = row[DbTopic.posted],
             author = userRepository.findUserById(row[DbTopic.author]) ?: User.getEmptyUser(),
             // TODO: Clean up and optimize these queries!!!
-            replies = emptyList())
+            replies = emptyList(),
+            replyCount = replyCount)
         return topic.copy(replies = topicQuery?.let {
             it.map { replyRow -> hydrateReply(replyRow, topic) }
         } ?: emptyList())

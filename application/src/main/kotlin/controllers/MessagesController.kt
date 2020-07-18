@@ -20,26 +20,34 @@ interface MessagesController : WithAuth, Controller {
 
 class MessagesControllerImpl(override val userRepository: UserRepository, private val messagesRepository: MessagesRepository) : MessagesController {
     override suspend fun getRoomPage(roomId: Int, call: ApplicationCall): View {
-        return withAuth(call) {
+        return withAuth(call) {activeUser ->
             if (roomId == -1) {
                 return@withAuth Http404View(call)
             }
-            val messages = withTransaction(messagesRepository) {
-                messagesRepository.getActiveRoom()?.topics ?: emptyList()
+            val room = withTransaction(messagesRepository) {
+                messagesRepository.getActiveRoom()
             }
-            TopicsView(messages, call)
+            if (room != null) {
+                TopicsView(room.topics, room, activeUser, call)
+            } else {
+                Http404View(call)
+            }
         }
     }
 
     override suspend fun getTopicPage(topicId: Int, call: ApplicationCall): View {
-        return withAuth(call) {
+        return withAuth(call) {activeUser ->
             if (topicId == -1) {
                 return@withAuth Http404View(call)
             }
-            val replies = withTransaction(messagesRepository) {
-                messagesRepository.getTopicById(topicId)?.replies ?: emptyList()
+            val (topic, activeRoom) = withTransaction(messagesRepository) {
+                Pair(messagesRepository.getTopicById(topicId), messagesRepository.getActiveRoom(false))
             }
-            RepliesView(replies, call)
+            if (topic == null || activeRoom == null) {
+                Http404View(call)
+            } else {
+                RepliesView(topic.replies, topic, activeUser, activeRoom, call)
+            }
         }
     }
 
