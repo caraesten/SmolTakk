@@ -1,3 +1,7 @@
+body {
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
+
 h2 {
     text-align: center;
 }
@@ -7,4 +11,98 @@ h2 {
     margin-right: auto;
     width: 500px;
     text-align: center;
+}
+
+.content {
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+    max-width: 600px;
+}
+
+.site-header {
+    text-align: center;
+}
+
+.site-header p {
+    font-size: 10pt;
+}
+
+.site-header a.back {
+    text-decoration: none;
+    font-size: 10pt;
+}
+
+.message h3 {
+    background-color: black;
+    color: white;
+    font-size: 12pt;
+    padding: 0.25em;
+    padding-left: 0.5em;
+    font-weight: normal;
+}
+
+.message h3 span {
+    display: block;
+}
+
+.message h3 span.username {
+    text-align: right;
+}
+
+.message h3 span.title {
+    float: left;
+}
+
+.message p {
+    padding-left: 0.5em;
+}
+
+.message .replies {
+    text-align: center;
+}
+
+.composer {
+    line-height: 1.6;
+}
+
+.composer .textarea-label {
+    display: block;
+}
+.composer textarea {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 200px;
+    display: block;
+}
+
+.composer input[type="submit"] {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0.5em;
+    display: block;
+}
+
+.composer:before {
+    content: " ";
+    display: block;
+    height: 0.75em;
+    margin-left: 0;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    width: 10%;
+    background-color: black;
+}
+
+.composer:after {
+    content: " ";
+    display: block;
+    height: 0.75em;
+    margin-left: auto;
+    margin-right: 0;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    width: 10%;
+    background-color: black;
 }

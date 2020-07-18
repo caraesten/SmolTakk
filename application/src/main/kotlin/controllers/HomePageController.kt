@@ -1,5 +1,6 @@
 package controllers
 
+import com.smoltakk.models.Urls.getRoomUrl
 import controllers.mixins.WithAuth
 import io.ktor.application.ApplicationCall
 import com.smoltakk.repositories.MessagesRepository
@@ -8,7 +9,6 @@ import views.Http404View
 import views.LoginRedirectView
 import views.RedirectView
 import views.View
-import web.Router.Companion.getRoomUrl
 
 interface HomePageController : WithAuth, Controller {
     fun getHomePage(call: ApplicationCall): View

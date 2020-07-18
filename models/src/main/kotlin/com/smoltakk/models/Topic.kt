@@ -9,4 +9,6 @@ data class Topic(
     override val author: User,
     override val posted: LocalDateTime,
     val replies: List<Reply> = emptyList(),
-    val replyCount: Int) : Message
+    val replyCount: Int) : Message {
+    override val url = Urls.getTopicUrl(id.toString())
+}

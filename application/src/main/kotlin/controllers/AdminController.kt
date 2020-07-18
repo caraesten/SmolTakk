@@ -1,5 +1,6 @@
 package controllers
 
+import com.smoltakk.models.Urls.getProfileUrl
 import com.smoltakk.models.User
 import com.smoltakk.repositories.MessagesRepository
 import com.smoltakk.repositories.UserRepository
@@ -10,7 +11,6 @@ import views.RedirectView
 import views.View
 import views.admin.RoomsView
 import views.admin.UsersView
-import web.Router.Companion.getProfileUrl
 
 private const val CARAS_EMAIL = "dondeesten@gmail.com" // lol I'm lazy sorry
 private const val PARAM_USERNAME = "username"

@@ -1,5 +1,6 @@
 package controllers
 
+import com.smoltakk.models.Urls.ROOM_URL
 import com.smoltakk.repositories.UserRepository
 import controllers.LoginController.Companion.PARAM_ERRORS
 import io.ktor.application.ApplicationCall
@@ -9,7 +10,6 @@ import views.LoginRedirectView
 import views.LoginView
 import views.RedirectView
 import views.View
-import web.Router.Companion.ROOM_URL
 import web.SiteSession
 
 

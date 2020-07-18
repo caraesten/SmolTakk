@@ -1,7 +1,7 @@
 package views.viewmodels
 
-import web.Router
+import com.smoltakk.models.Urls.LOGIN_URL
 
 data class Login(val errors: List<String>) {
-    val loginFormAction = Router.LOGIN_URL
+    val loginFormAction = LOGIN_URL
 }

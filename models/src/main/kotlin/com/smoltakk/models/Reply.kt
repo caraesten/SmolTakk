@@ -6,4 +6,6 @@ data class Reply(
     val topic: Topic,
     override val author: User,
     override val body: String,
-    override val posted: LocalDateTime) : Message
+    override val posted: LocalDateTime) : Message {
+    override val url = Urls.getTopicUrl(topic.id.toString())
+}

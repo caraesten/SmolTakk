@@ -1,11 +1,11 @@
 package controllers
 
+import com.smoltakk.models.Urls.getTopicUrl
 import com.smoltakk.repositories.MessagesRepository
 import com.smoltakk.repositories.UserRepository
 import controllers.mixins.WithAuth
 import io.ktor.application.ApplicationCall
 import views.*
-import web.Router.Companion.getTopicUrl
 
 private const val PARAM_SUBJECT = "subject"
 private const val PARAM_BODY = "body"

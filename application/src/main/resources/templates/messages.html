@@ -3,30 +3,33 @@
 <html>
 <head>
     <title>T A L K</title>
+    <link rel="stylesheet" type="text/css" href="/static/main.css">
 </head>
 <body>
     <div class="content">
         <div class="site-header">
             <p>
-                Logged in as {{activeUser.username}}
+                _logged in as {{activeUser.username}}_
             </p>
             <p>
-                This site will self destruct in {{roomTtlDays}} days, {{roomTtlHours}} hours, {{roomTtlMinutes}} minutes.
+                _this site will self destruct in {{roomTtlDays}} days, {{roomTtlHours}} hours, {{roomTtlMinutes}} minutes_
             </p>
+            {{#isReplies}}
+                <a href="/" class="back">...back...</a>
+            {{/isReplies}}
         </div>
         {{#header}}
             <div class="message header topic">
-                <h3>{{title}} – {{author.username}}</h3>
+                <h3><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>
                 <p>{{body}}</p>
-                <p>{{replyCount}} replies</p>
+                <p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>
             </div>
         {{/header}}
         {{#firstTwoMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
-                {{#isTopics}}<h3>{{title}} – {{author.username}}</h3>{{/isTopics}}
+                {{#isTopics}}<h3><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>{{/isTopics}}
                 <p>{{body}}</p>
-                {{#isTopics}}<p>{{replyCount}} replies</p>{{/isTopics}}
-                {{#isReplies}}–{{author.username}}{{/isReplies}}
+                {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}
             </div>
         {{/firstTwoMessages}}
         {{#isTopics}}
@@ -34,7 +37,7 @@
                 <form action="{{postTopic}}" method="post">
                     <label for="subject">Title: </label>
                     <input type="text" id="subject" name="subject" />
-                    <label for="body">Message: </label>
+                    <label for="body" class="textarea-label">Message: </label>
                     <textarea rows="4" cols="6" name="body" id="body"></textarea>
                     <input type="submit" />
                 </form>
@@ -42,9 +45,9 @@
         {{/isTopics}}
         {{#remainingMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
-                {{#isTopics}}<h3><h3>{{title}} – {{author.username}}</h3></h3> {{/isTopics}}
+                {{#isTopics}}<h3><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>{{/isTopics}}
                 <p>{{body}}</p>
-                {{#isTopics}}<p> {{ replyCount }} replies</p>{{/isTopics}}
+                {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}
             </div>
         {{/remainingMessages}}
 

@@ -2,9 +2,9 @@ package views.viewmodels
 
 import com.smoltakk.models.Message
 import com.smoltakk.models.Room
+import com.smoltakk.models.Urls.ROOM_URL
+import com.smoltakk.models.Urls.TOPIC_URL
 import com.smoltakk.models.User
-import web.Router.Companion.ROOM_URL
-import web.Router.Companion.TOPIC_URL
 import java.time.LocalDateTime
 import java.time.Period
 import kotlin.time.ExperimentalTime
@@ -40,6 +40,8 @@ data class Messages<T : Message>(val messages: List<T>,
     val roomTtlHours = duration.hours
     @ExperimentalTime
     val roomTtlMinutes = duration.minutes
+
+    val topicUrlBase = TOPIC_URL
 
     companion object {
         private const val ROOM_TTL_DAYS = 3
