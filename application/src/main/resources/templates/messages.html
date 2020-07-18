@@ -16,16 +16,17 @@
         </div>
         {{#header}}
             <div class="message header topic">
-                <h3>{{title}}</h3>
+                <h3>{{title}} – {{author.username}}</h3>
                 <p>{{body}}</p>
                 <p>{{replyCount}} replies</p>
             </div>
         {{/header}}
         {{#firstTwoMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
-                {{#isTopics}}<h3>{{title}}</h3> {{/isTopics}}
+                {{#isTopics}}<h3>{{title}} – {{author.username}}</h3>{{/isTopics}}
                 <p>{{body}}</p>
                 {{#isTopics}}<p>{{replyCount}} replies</p>{{/isTopics}}
+                {{#isReplies}}–{{author.username}}{{/isReplies}}
             </div>
         {{/firstTwoMessages}}
         {{#isTopics}}
@@ -41,7 +42,7 @@
         {{/isTopics}}
         {{#remainingMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
-                {{#isTopics}}<h3>{{title}}</h3> {{/isTopics}}
+                {{#isTopics}}<h3><h3>{{title}} – {{author.username}}</h3></h3> {{/isTopics}}
                 <p>{{body}}</p>
                 {{#isTopics}}<p> {{ replyCount }} replies</p>{{/isTopics}}
             </div>
