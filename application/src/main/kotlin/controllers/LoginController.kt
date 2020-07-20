@@ -20,6 +20,7 @@ private const val PARAM_PASSWORD = "password"
 interface LoginController : Controller {
     suspend fun getLoginPage(call: ApplicationCall): View
     suspend fun performLogin(call: ApplicationCall): View
+    suspend fun performLogout(call: ApplicationCall): View
 
     companion object {
         const val PARAM_ERRORS = "errors"
@@ -46,5 +47,10 @@ class LoginControllerImpl(val userRepository: UserRepository) : LoginController 
                 RedirectView(call, ROOM_URL)
             } ?: LoginRedirectView(call, errors = listOf(ERROR_BAD_LOGIN))
         }
+    }
+
+    override suspend fun performLogout(call: ApplicationCall): View {
+        call.sessions.set(SiteSession(authToken = ""))
+        return LoginRedirectView(call)
     }
 }

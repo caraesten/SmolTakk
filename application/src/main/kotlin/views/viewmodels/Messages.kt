@@ -2,6 +2,7 @@ package views.viewmodels
 
 import com.smoltakk.models.Message
 import com.smoltakk.models.Room
+import com.smoltakk.models.Urls
 import com.smoltakk.models.Urls.ROOM_URL
 import com.smoltakk.models.Urls.TOPIC_URL
 import com.smoltakk.models.User
@@ -42,6 +43,8 @@ data class Messages<T : Message>(val messages: List<T>,
     val roomTtlMinutes = duration.minutes
 
     val topicUrlBase = TOPIC_URL
+
+    val profileUrl = Urls.getProfileUrl(activeUser.username)
 
     companion object {
         private const val ROOM_TTL_DAYS = 3

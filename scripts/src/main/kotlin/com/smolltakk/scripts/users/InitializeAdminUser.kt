@@ -1,12 +1,12 @@
 package com.smolltakk.scripts.users
 
-import com.smoltakk.repositories.setup.InitializeAdminUser
+import com.smoltakk.repositories.tools.InitializeAdminUser
 
 class InitializeAdminUser {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            InitializeAdminUser.setup()
+            InitializeAdminUser.run()
         }
     }
 }

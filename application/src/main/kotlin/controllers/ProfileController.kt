@@ -41,11 +41,13 @@ class ProfileControllerImpl(override val userRepository: UserRepository) : Profi
                     if (user != loggedInUser) {
                         Http403View(call)
                     } else {
+                        val newUsername = if (params[PARAM_USERNAME].equals(loggedInUser.username)) null else params[PARAM_USERNAME]
+                        val newEmail = if (params[PARAM_EMAIL].equals(loggedInUser.username)) null else params[PARAM_EMAIL]
                         val result = userRepository.updateUserProfile(
                             loggedInUser,
-                            params[PARAM_USERNAME],
+                            newUsername,
                             params[PARAM_PASSWORD],
-                            params[PARAM_EMAIL]
+                            newEmail
                         )
                         val redirUser = if (result is UserRepository.UserUpdateStatus.Success) {
                             call.sessions.set(SiteSession(authToken = result.user.authToken))

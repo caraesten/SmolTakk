@@ -28,4 +28,8 @@ tasks {
         main = "com.smolltakk.scripts.users.InitializeAdminUser"
         classpath = sourceSets.main.get().runtimeClasspath
     }
+    register("updateUser", JavaExec::class.java) {
+        main = "com.smolltakk.scripts.users.UpdateUser"
+        classpath = sourceSets.main.get().runtimeClasspath
+    }
 }

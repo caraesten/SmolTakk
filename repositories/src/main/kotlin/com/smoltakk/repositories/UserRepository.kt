@@ -88,9 +88,10 @@ class UserRepositoryImpl(override val database: Database, private val saltSecret
             username = username ?: user.username,
             email = email ?: user.email)
         val timestamp = System.currentTimeMillis().toString()
-        val hashedPassword = password?.let {
-            generateHashedPassword(generateSalt(timestamp, intermediateUser.username), password)
-        }
+        val (hashedPassword, salt) = password?.let {
+            val newSalt = generateSalt(timestamp, intermediateUser.username)
+            Pair(generateHashedPassword(newSalt, password), newSalt)
+        } ?: Pair(null, null)
         val newToken = if (!username.isNullOrEmpty() || !hashedPassword.isNullOrEmpty()) {
             generateToken(intermediateUser.username, timestamp)
         } else {
@@ -104,6 +105,7 @@ class UserRepositoryImpl(override val database: Database, private val saltSecret
             dbUser[DbUser.email] = newUser.email
             if (!hashedPassword.isNullOrEmpty()) {
                 dbUser[DbUser.hashedPassword] = hashedPassword
+                dbUser[DbUser.salt] = salt!!
                 dbUser[DbUser.authToken] = newToken
                 dbUser[DbUser.tokenIssued] = LocalDateTime.now()
             }

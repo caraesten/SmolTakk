@@ -2,6 +2,7 @@ package com.smoltakk.models
 
 object Urls {
     const val LOGIN_URL = "/login"
+    const val LOGOUT_URL = "/logout"
     const val ROOM_URL = "/"
     const val TOPIC_URL = "/topic/"
     const val PROFILE_URL = "/profile/"

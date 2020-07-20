@@ -2,6 +2,7 @@ package web
 
 import com.smoltakk.models.Urls.ADMIN_NEW_ROOM_PATH
 import com.smoltakk.models.Urls.LOGIN_URL
+import com.smoltakk.models.Urls.LOGOUT_URL
 import com.smoltakk.models.Urls.PROFILE_URL
 import com.smoltakk.models.Urls.ROOM_URL
 import com.smoltakk.models.Urls.getTopicUrl
@@ -41,6 +42,9 @@ class Router(
 
             get(LOGIN_URL) {
                 loginController.getLoginPage(call).render()
+            }
+            get(LOGOUT_URL) {
+                loginController.performLogout(call).render()
             }
             post(LOGIN_URL) {
                 loginController.performLogin(call).render()
