@@ -4,7 +4,7 @@ import com.smoltakk.db.DatabaseFactory
 import com.smoltakk.repositories.UserRepository
 import com.smoltakk.repositories.UserRepositoryImpl
 
-abstract class UserTools {
+open class UserTools {
     val tokenSecret = System.getenv("ST_TOKEN_SECRET")!!
     val saltSecret = System.getenv("ST_SALT_SECRET")!!
     val dbUrl = System.getenv("ST_DB_URL")!!
