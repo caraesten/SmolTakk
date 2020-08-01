@@ -6,7 +6,9 @@ import javax.mail.Message
 import javax.mail.Session
 import javax.mail.Transport
 import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
+import javax.mail.internet.MimeMultipart
 
 private const val FROM_FIELD = "no_reply@smoltakk.com"
 
@@ -19,7 +21,11 @@ class EmailSender(private val smtpSession: Session) {
             setFrom(InternetAddress(FROM_FIELD))
             setReplyTo(InternetAddress.parse(FROM_FIELD, false))
             setSubject(view.subject)
-            setText(view.renderHtml(), "UTF-8")
+            val multipart = MimeMultipart("alternative").apply {
+                addBodyPart(MimeBodyPart().apply { setText(view.renderHtml(), "utf-8", "html") })
+                addBodyPart(MimeBodyPart().apply { setText(view.renderText(), "utf-8", "text")})
+            }
+            setContent(multipart)
             setSentDate(Date())
             setRecipients(Message.RecipientType.TO, InternetAddress.parse(users.map{ it.email}.joinToString(","), false)) }
         Transport.send(message)
