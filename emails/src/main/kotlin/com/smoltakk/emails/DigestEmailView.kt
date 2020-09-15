@@ -1,13 +1,19 @@
 package com.smoltakk.emails
 
+import com.smoltakk.models.Room
 import com.smoltakk.models.Topic
 import com.smoltakk.models.Urls
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import kotlinx.html.stream.createHTML
+import java.time.LocalDateTime
+import java.time.Period
 
-class DigestEmailView(private val topics: List<Topic>) : EmailView {
+class DigestEmailView(private val topics: List<Topic>, private val createdAt: LocalDateTime) : EmailView {
     override val subject = "Yr daily TALK digest!"
+
+    private val willExpire = (createdAt + Period.ofDays(Room.ROOM_TTL_DAYS))
+
 
     override fun renderHtml() = buildString {
         appendln("<!DOCTYPE html>")
@@ -15,6 +21,12 @@ class DigestEmailView(private val topics: List<Topic>) : EmailView {
             body {
                 h1 {
                     text("TALK digest")
+                }
+                h3 {
+                    text("These discussion will expire on:")
+                }
+                h3 {
+                    text("${willExpire.month} ${willExpire.dayOfMonth} at ${willExpire.hour}:${willExpire.minute} GMT")
                 }
                 div {
                     topics.forEach { topic ->

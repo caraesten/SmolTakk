@@ -5,6 +5,8 @@ import com.smoltakk.repositories.UserRepository
 import com.smoltakk.repositories.UserRepositoryImpl
 import com.smoltakk.repositories.tools.MessagesTools
 import com.smoltakk.repositories.tools.UserTools
+import java.time.LocalDateTime
+import java.time.Period
 import javax.mail.Session
 
 object SendDigestEmailsTask {
@@ -30,7 +32,7 @@ object SendDigestEmailsTask {
 
         val room = messagesRepository.getActiveRoom()
         room?.let {
-            emailSender.sendEmailToUsers(DigestEmailView(it.topics), users)
+            emailSender.sendEmailToUsers(DigestEmailView(it.topics, it.created), users)
         }
     }
 }

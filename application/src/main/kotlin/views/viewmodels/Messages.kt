@@ -29,7 +29,7 @@ data class Messages<T : Message>(val messages: List<T>,
     val postReply = "$TOPIC_URL$rootId"
 
     @ExperimentalTime
-    private val roomTtl = java.time.Duration.between(LocalDateTime.now(), activeRoom.created + Period.ofDays(ROOM_TTL_DAYS)).toKotlinDuration()
+    private val roomTtl = java.time.Duration.between(LocalDateTime.now(), activeRoom.created + Period.ofDays(Room.ROOM_TTL_DAYS)).toKotlinDuration()
     @ExperimentalTime
     private val duration = roomTtl.toComponents { days: Int, hours: Int, minutes: Int, _: Int, _: Int ->
         DurationComponents(days, hours, minutes)
@@ -46,9 +46,6 @@ data class Messages<T : Message>(val messages: List<T>,
 
     val profileUrl = Urls.getProfileUrl(activeUser.username)
 
-    companion object {
-        private const val ROOM_TTL_DAYS = 3
-    }
     private data class DurationComponents(val days: Int, val hours: Int, val minutes: Int)
 
 }
