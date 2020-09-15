@@ -12,12 +12,16 @@ object SendDigestEmailsTask {
     val messagesRepository = MessagesTools().getMessagesRepo()
 
     fun sendTestDigestEmail(smtpHost: String, sendTo: String /* username */) {
-        val users = listOfNotNull(userRepository.findUserByUsername(sendTo))
-        sendEmailTo(users, smtpHost)
+        userRepository.withTransaction {
+            val users = listOfNotNull(userRepository.findUserByUsername(sendTo))
+            sendEmailTo(users, smtpHost)
+        }
     }
 
     fun sendAllDigestEmails(smtpHost: String) {
-        sendEmailTo(userRepository.getAllUsers(), smtpHost)
+        userRepository.withTransaction {
+            sendEmailTo(userRepository.getAllUsers(), smtpHost)
+        }
     }
 
     private fun sendEmailTo(users: List<User>, smtpHost: String) {

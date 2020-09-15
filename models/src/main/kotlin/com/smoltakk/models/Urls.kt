@@ -8,8 +8,10 @@ object Urls {
     const val PROFILE_URL = "/profile/"
     const val ADMIN_NEW_ROOM_PATH = "/admin/rooms/new"
     const val ADMIN_NEW_USER_PATH = "/admin/users/new"
+    const val REVIVE_URL = "/revive/"
 
     fun getTopicUrl(topicId: String) = "$TOPIC_URL$topicId"
     fun getRoomUrl(roomId: Int) = "$ROOM_URL$roomId"
     fun getProfileUrl(username: String) = "$PROFILE_URL$username"
+    fun getReviveUrl(topicId: String) = "$REVIVE_URL$topicId"
 }

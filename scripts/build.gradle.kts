@@ -9,6 +9,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":database"))
     implementation(project(":repositories"))
+    implementation(project(":emails"))
 }
 
 sourceSets.getByName("main").java.srcDirs("src/main/kotlin")
@@ -30,6 +31,10 @@ tasks {
     }
     register("updateUser", JavaExec::class.java) {
         main = "com.smolltakk.scripts.users.UpdateUser"
+        classpath = sourceSets.main.get().runtimeClasspath
+    }
+    register("sendEmail", JavaExec::class.java) {
+        main = "com.smolltakk.scripts.messages.SendDigestEmails"
         classpath = sourceSets.main.get().runtimeClasspath
     }
 }

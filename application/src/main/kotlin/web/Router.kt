@@ -5,6 +5,7 @@ import com.smoltakk.models.Urls.LOGIN_URL
 import com.smoltakk.models.Urls.LOGOUT_URL
 import com.smoltakk.models.Urls.PROFILE_URL
 import com.smoltakk.models.Urls.ROOM_URL
+import com.smoltakk.models.Urls.getReviveUrl
 import com.smoltakk.models.Urls.getTopicUrl
 import controllers.*
 import io.ktor.application.call
@@ -56,7 +57,7 @@ class Router(
             post(getTopicUrl("{topic_id}")) {
                 messagesController.postNewReply(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()
             }
-            get("${getTopicUrl("{topic_id}")}/carryover") {
+            get(getReviveUrl("{topic_id}")) {
                 messagesController.carryOverTopic(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()
             }
 
