@@ -1,5 +1,7 @@
 plugins {
     kotlin("jvm")
+    application
+    id("com.github.johnrengelman.shadow") version "5.0.0"
 }
 
 group = "com.smolltakk"
@@ -13,6 +15,10 @@ dependencies {
 }
 
 sourceSets.getByName("main").java.srcDirs("src/main/kotlin")
+
+application {
+    mainClassName = "com.smolltakk.scripts.ScriptsMain"
+}
 
 tasks {
     compileKotlin {
@@ -36,5 +42,13 @@ tasks {
     register("sendEmail", JavaExec::class.java) {
         main = "com.smolltakk.scripts.messages.SendDigestEmails"
         classpath = sourceSets.main.get().runtimeClasspath
+    }
+
+    jar {
+        manifest {
+            attributes(mapOf(
+                "Main-Class" to application.mainClassName
+            ))
+        }
     }
 }

@@ -1,5 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm")
+    application
+    id("com.github.johnrengelman.shadow") version "5.0.0"
 }
 
 group = "com.smoltakk"
@@ -23,11 +27,27 @@ dependencies {
     implementation(project(":models"))
 }
 
+application {
+    mainClassName = "io.ktor.server.jetty.EngineMain"
+}
+
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
+    }
+    withType<Jar> {
+        manifest {
+            attributes(
+                mapOf(
+                    "Main-Class" to application.mainClassName
+                )
+            )
+        }
+    }
+    withType<ShadowJar> {
+        mergeServiceFiles()
     }
 }
