@@ -38,7 +38,7 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
-    withType<Jar> {
+    jar {
         manifest {
             attributes(
                 mapOf(
