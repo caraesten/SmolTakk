@@ -18,12 +18,20 @@ class ScriptsMain {
         )
         @JvmStatic
         fun main(args: Array<String>) {
+            if (args.size == 0) {
+                outputHelp()
+                return
+            }
             val slicedArgs = args.drop(0).toTypedArray()
             val functionToRun = tools[args[0]]
             functionToRun?.invoke(slicedArgs)
             if (functionToRun == null) {
-                System.out.println("Commands: ${tools.keys.joinToString { "$it, "}}")
+                outputHelp()
             }
+        }
+
+        private fun outputHelp() {
+            println("Commands: ${tools.keys.joinToString()}")
         }
     }
 }
