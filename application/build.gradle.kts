@@ -8,7 +8,7 @@ version = "1.0-SNAPSHOT"
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("io.ktor:ktor-server-core:1.3.2")
-    implementation("io.ktor:ktor-server-netty:1.3.2")
+    implementation("io.ktor:ktor-server-jetty:1.3.2")
     implementation("io.ktor:ktor-server-sessions:1.3.2")
     implementation("io.ktor:ktor-mustache:1.3.2")
     implementation("com.zaxxer:HikariCP:2.7.8")
