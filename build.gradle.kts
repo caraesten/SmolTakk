@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm") version "1.3.72"
     application
@@ -35,5 +37,8 @@ tasks {
                 )
             )
         }
+    }
+    withType<ShadowJar> {
+        mergeServiceFiles()
     }
 }
