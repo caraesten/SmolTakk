@@ -49,7 +49,7 @@ class MessagesRepositoryImpl @Inject constructor(override val database: Database
     override fun getTopicsForRoom(id: Int): List<Topic> {
         return DbTopic.innerJoin(DbRoom).select { DbRoom.id eq id }
             .andWhere { DbRoom.id eq DbTopic.room }
-            .orderBy( DbTopic.id, SortOrder.DESC)
+            .orderBy( DbTopic.posted, SortOrder.DESC)
             .map { topicResult ->
                 hydrateTopic(topicResult,
                     TopicHydrationType.ABBREVIATED
@@ -97,12 +97,15 @@ class MessagesRepositoryImpl @Inject constructor(override val database: Database
     }
 
     override fun createReply(parentId: TopicId, body: String, author: User): TopicId? {
-        // TODO: Check if topic exists + belongs to an active room before allowing the reply
+        val topic = getTopicById(parentId) ?: return null
         DbReply.insertAndGetId {
             it[DbReply.parent] = parentId
             it[DbReply.author] = author.id
             it[DbReply.body] = body
             it[DbReply.posted] = LocalDateTime.now()
+        }
+        DbTopic.update({ DbTopic.id eq topic.id }) {
+            it[DbTopic.posted] = LocalDateTime.now()
         }
         return parentId
     }
