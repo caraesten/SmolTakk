@@ -27,23 +27,6 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
-    register("createDb", JavaExec::class.java) {
-        main = "com.smolltakk.scripts.db.CreateDb"
-        classpath = sourceSets.main.get().runtimeClasspath
-    }
-    register("bootstrapAdmin", JavaExec::class.java) {
-        main = "com.smolltakk.scripts.users.InitializeAdminUser"
-        classpath = sourceSets.main.get().runtimeClasspath
-    }
-    register("updateUser", JavaExec::class.java) {
-        main = "com.smolltakk.scripts.users.UpdateUser"
-        classpath = sourceSets.main.get().runtimeClasspath
-    }
-    register("sendEmail", JavaExec::class.java) {
-        main = "com.smolltakk.scripts.messages.SendDigestEmails"
-        classpath = sourceSets.main.get().runtimeClasspath
-    }
-
     jar {
         manifest {
             attributes(mapOf(
