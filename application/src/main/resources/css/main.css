@@ -134,3 +134,11 @@ h2 {
     display: block;
     margin-top: 1em;
 }
+
+p.attribution {
+    font-size: 10pt;
+    font-style: italic;
+    border-bottom: 1px solid #ccc;
+    text-align: right;
+    padding-bottom: 0.25em;
+}
