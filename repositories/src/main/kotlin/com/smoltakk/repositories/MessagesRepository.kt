@@ -118,10 +118,10 @@ class MessagesRepositoryImpl @Inject constructor(override val database: Database
         val topicId = row[DbTopic.id].value
         val topicQuery = when (type) {
             TopicHydrationType.DEEP -> {
-                DbReply.select { DbReply.parent eq topicId}.orderBy(DbReply.posted to SortOrder.DESC)
+                DbReply.select { DbReply.parent eq topicId}.orderBy(DbReply.posted to SortOrder.ASC)
             }
             TopicHydrationType.ABBREVIATED -> {
-                DbReply.select { DbReply.parent eq topicId}.orderBy(DbReply.posted to SortOrder.DESC).limit(3)
+                DbReply.select { DbReply.parent eq topicId}.orderBy(DbReply.posted to SortOrder.ASC).limit(3)
             }
             TopicHydrationType.SHALLOW -> {
                 null
