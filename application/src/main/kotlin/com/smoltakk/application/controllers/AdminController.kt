@@ -8,6 +8,7 @@ import com.smoltakk.application.controllers.mixins.WithAuth
 import com.smoltakk.application.di.ApplicationSingleton
 import io.ktor.application.ApplicationCall
 import com.smoltakk.application.views.Http403View
+import com.smoltakk.application.views.Http404View
 import com.smoltakk.application.views.RedirectView
 import com.smoltakk.application.views.View
 import com.smoltakk.application.views.admin.RoomsView
@@ -55,8 +56,12 @@ class AdminControllerImpl @Inject constructor(override val userRepository: UserR
             if (email.isNullOrEmpty() || username.isNullOrEmpty() || password.isNullOrEmpty()) {
                 RedirectView(call, "")
             } else {
-                val user = withTransaction(userRepository) { userRepository.createUser(email, username, password) }
-                RedirectView(call, if (user != null) getProfileUrl(user.username) else "")
+                val userStatus = withTransaction(userRepository) { userRepository.createUser(email, username, password) }
+                if (userStatus is UserRepository.UserUpdateStatus.Success) {
+                    RedirectView(call, getProfileUrl(userStatus.user.username))
+                } else {
+                    RedirectView(call, "")
+                }
             }
         }
     }

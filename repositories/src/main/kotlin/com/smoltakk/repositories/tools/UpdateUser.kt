@@ -7,20 +7,27 @@ object UpdateUser : UserTools() {
         val userRepository = getUserRepo()
         userRepository.withTransaction {
             val userToUpdate = userRepository.findUserByUsername(username)
-            if (userToUpdate == null) {
-                println("ERROR! Can't find user!")
+            val status = if (userToUpdate == null) {
+                println("Creating user...")
+                if (newEmail.isNullOrBlank() || newUsername.isNullOrBlank() || newPassword.isNullOrBlank()) {
+                    println("ERROR: you need all fields to create a user!")
+                    UserRepository.UserUpdateStatus.Invalid
+                } else {
+                    userRepository.createUser(newEmail, newUsername, newPassword)
+                }
             } else {
-                val status = userRepository.updateUserProfile(
+                println("Updating user...")
+                userRepository.updateUserProfile(
                     userToUpdate,
                     newUsername,
                     newPassword,
                     newEmail
                 )
-                if (status is UserRepository.UserUpdateStatus.Success) {
-                    println("success")
-                } else {
-                    println("error! $status")
-                }
+            }
+            if (status is UserRepository.UserUpdateStatus.Success) {
+                println("success")
+            } else {
+                println("error! $status")
             }
         }
     }

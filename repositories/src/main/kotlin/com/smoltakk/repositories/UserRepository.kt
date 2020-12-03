@@ -18,7 +18,7 @@ interface UserRepository : Repository {
         object AlreadyExists : Failure()
     }
 
-    fun createUser(newUserEmail: String, newUserUsername: String, newUserPassword: String): User?
+    fun createUser(newUserEmail: String, newUserUsername: String, newUserPassword: String): UserUpdateStatus
     fun loginUser(email: String, password: String): User?
     fun getAllUsers(): List<User>
     fun findUserById(id: Int): User?
@@ -32,7 +32,7 @@ class UserRepositoryImpl @Inject constructor(override val database: Database,
                                              @SaltSecret private val saltSecret: String,
                                              @TokenSecret private val tokenSecret: String) :
     UserRepository {
-    override fun createUser(newUserEmail: String, newUserUsername: String, newUserPassword: String): User? {
+    override fun createUser(newUserEmail: String, newUserUsername: String, newUserPassword: String): UserRepository.UserUpdateStatus {
         val id = DbUser.insertAndGetId {
             val timestamp = System.currentTimeMillis().toString()
 
@@ -44,7 +44,7 @@ class UserRepositoryImpl @Inject constructor(override val database: Database,
             it[authToken] = generateToken(newUserUsername, timestamp)
             it[tokenIssued] = LocalDateTime.now()
         }
-        return findUserById(id.value)
+        return findUserById(id.value)?.let { UserRepository.UserUpdateStatus.Success(it) } ?: UserRepository.UserUpdateStatus.Invalid
     }
 
     override fun loginUser(email: String, password: String): User? {

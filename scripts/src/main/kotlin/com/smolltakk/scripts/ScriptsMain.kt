@@ -18,11 +18,11 @@ class ScriptsMain {
         )
         @JvmStatic
         fun main(args: Array<String>) {
-            if (args.size == 0) {
+            if (args.isEmpty()) {
                 outputHelp()
                 return
             }
-            val slicedArgs = args.drop(0).toTypedArray()
+            val slicedArgs = args.drop(1).toTypedArray()
             val functionToRun = tools[args[0]]
             functionToRun?.invoke(slicedArgs)
             if (functionToRun == null) {

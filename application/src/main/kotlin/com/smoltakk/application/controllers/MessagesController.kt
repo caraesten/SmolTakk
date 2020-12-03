@@ -7,6 +7,7 @@ import com.smoltakk.application.controllers.mixins.WithAuth
 import com.smoltakk.application.di.ApplicationSingleton
 import io.ktor.application.ApplicationCall
 import com.smoltakk.application.views.*
+import com.smoltakk.models.Urls.getRoomUrl
 import javax.inject.Inject
 
 private const val PARAM_SUBJECT = "subject"
@@ -30,8 +31,10 @@ class MessagesControllerImpl @Inject constructor(override val userRepository: Us
             val room = withTransaction(messagesRepository) {
                 messagesRepository.getActiveRoom()
             }
-            if (room != null) {
+            if (room != null && room.id == roomId) {
                 TopicsView(room.topics, room, activeUser, call)
+            } else if (room != null) {
+                RedirectView(call, getRoomUrl(room.id))
             } else {
                 Http404View(call)
             }

@@ -9,7 +9,7 @@ class UpdateUser {
             val newEmail = args.find { it.startsWith("email=") }?.replace("email=", "")
             val newPassword = args.find { it.startsWith("password=") }?.replace("password=", "")
 
-            println("Updating user: $username... ")
+            println("Updating / creating user: $username... ")
             newUsername?.let {
                 println("New username: $it")
             }
