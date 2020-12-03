@@ -6,7 +6,7 @@ class CreateRoom {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            CreateRoom.run()
+            CreateRoom.run(args.any { it == "checkTime" })
         }
     }
 }
