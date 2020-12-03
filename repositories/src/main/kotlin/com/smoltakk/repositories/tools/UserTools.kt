@@ -1,6 +1,6 @@
 package com.smoltakk.repositories.tools
 
-import com.smoltakk.db.DatabaseFactory
+import com.smoltakk.db.di.DaggerDatabaseComponent
 import com.smoltakk.repositories.UserRepository
 import com.smoltakk.repositories.UserRepositoryImpl
 
@@ -12,7 +12,7 @@ open class UserTools {
     val dbPass = System.getenv("ST_DB_PASSWORD")!!
 
     fun getUserRepo(): UserRepository {
-        val database = DatabaseFactory(dbUrl, dbUser, dbPass).init()
+        val database = DaggerDatabaseComponent.factory().newDatabaseComponent(dbUrl, dbUser, dbPass).database()
         return UserRepositoryImpl(database, saltSecret, tokenSecret)
     }
 }

@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin("kapt")
 }
 
 group = "com.smoltakk.db"
@@ -13,6 +14,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:0.26.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.26.1")
     implementation("org.jetbrains.exposed:exposed-java-time:0.26.1")
+    api("com.google.dagger:dagger:2.30.1")
+    kapt("com.google.dagger:dagger-compiler:2.30.1")
 }
 
 tasks {

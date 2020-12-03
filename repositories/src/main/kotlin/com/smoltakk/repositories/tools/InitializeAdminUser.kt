@@ -1,8 +1,5 @@
 package com.smoltakk.repositories.tools
 
-import com.smoltakk.db.DatabaseFactory
-import com.smoltakk.repositories.UserRepositoryImpl
-
 object InitializeAdminUser : UserTools() {
     // Eventually this'll share the application config, but it does not now!
     private val adminUsername = System.getenv("ST_ADMIN_USER")!!

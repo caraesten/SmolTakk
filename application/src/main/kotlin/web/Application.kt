@@ -1,35 +1,31 @@
 package web
 
 import com.github.mustachejava.DefaultMustacheFactory
-import com.smoltakk.db.DatabaseFactory
+import com.smoltakk.models.Configuration
+import com.smoltakk.repositories.di.DaggerRepositoriesComponent
 import controllers.*
-import io.ktor.application.Application
-import io.ktor.application.install
-import io.ktor.features.CallLogging
-import io.ktor.features.DefaultHeaders
-import io.ktor.mustache.Mustache
-import io.ktor.routing.Routing
-import io.ktor.sessions.Sessions
-import io.ktor.sessions.cookie
-import com.smoltakk.repositories.MessagesRepository
-import com.smoltakk.repositories.MessagesRepositoryImpl
-import com.smoltakk.repositories.UserRepository
-import com.smoltakk.repositories.UserRepositoryImpl
+import io.ktor.application.*
+import io.ktor.config.*
+import io.ktor.features.*
+import io.ktor.mustache.*
+import io.ktor.routing.*
+import io.ktor.sessions.*
+
+fun ApplicationConfig.createConfiguration() = Configuration(
+    this.property("ktor.application.saltSecret").getString(),
+    this.property("ktor.application.tokenSecret").getString(),
+    this.property("ktor.db.jdbcUrl").getString(),
+    this.property("ktor.db.jdbcUser").getString(),
+    this.property("ktor.db.jdbcPassword").getString()
+)
 
 fun Application.main() {
     // TODO: Move to DI
-    val saltSecret = this.environment.config.propertyOrNull("ktor.application.saltSecret")?.getString() ?: ""
-    val tokenSecret = this.environment.config.propertyOrNull("ktor.application.tokenSecret")?.getString() ?: ""
+    val appConfiguration = this.environment.config.createConfiguration()
 
-    val dbUrl = this.environment.config.propertyOrNull("ktor.db.jdbcUrl")?.getString()!!
-    val dbUser = this.environment.config.propertyOrNull("ktor.db.jdbcUser")?.getString()!!
-    val dbPassword = this.environment.config.propertyOrNull("ktor.db.jdbcPassword")?.getString()!!
-
-    // db shouldn't be a dependency of application, but until I get a nicer DI setup for some indirection, it has to be
-    val database = DatabaseFactory(dbUrl, dbUser, dbPassword).init()
-
-    val userRepo: UserRepository = UserRepositoryImpl(database, saltSecret, tokenSecret)
-    val messagesRepo: MessagesRepository = MessagesRepositoryImpl(database, userRepo)
+    val reposComponent = DaggerRepositoriesComponent.factory().newRepositoriesComponent(appConfiguration)
+    val userRepo = reposComponent.userRepository()
+    val messagesRepo = reposComponent.messagesRepository()
 
     val homePageController: HomePageController = HomePageControllerImpl(userRepo, messagesRepo)
     val adminController: AdminController = AdminControllerImpl(userRepo, messagesRepo)
@@ -37,7 +33,7 @@ fun Application.main() {
     val messagesController: MessagesController = MessagesControllerImpl(userRepo, messagesRepo)
     val profileController: ProfileController = ProfileControllerImpl(userRepo)
 
-    val router: Router = Router(homePageController, messagesController, profileController, loginController, adminController)
+    val router = Router(homePageController, messagesController, profileController, loginController, adminController)
     install(DefaultHeaders)
     install(CallLogging)
     install(Sessions) {

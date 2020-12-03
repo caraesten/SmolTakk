@@ -2,9 +2,13 @@ package com.smoltakk.repositories
 
 import com.smoltakk.db.User as DbUser
 import com.smoltakk.models.User
+import com.smoltakk.repositories.di.SaltSecret
+import com.smoltakk.repositories.di.TokenSecret
 import com.smoltakk.repositories.util.hashSha512
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface UserRepository : Repository {
     sealed class UserUpdateStatus() {
@@ -23,7 +27,10 @@ interface UserRepository : Repository {
     fun updateUserProfile(user: User, username: String?, password: String?, email: String?): UserUpdateStatus
 }
 
-class UserRepositoryImpl(override val database: Database, private val saltSecret: String, private val tokenSecret: String) :
+@Singleton
+class UserRepositoryImpl @Inject constructor(override val database: Database,
+                                             @SaltSecret private val saltSecret: String,
+                                             @TokenSecret private val tokenSecret: String) :
     UserRepository {
     override fun createUser(newUserEmail: String, newUserUsername: String, newUserPassword: String): User? {
         val id = DbUser.insertAndGetId {
