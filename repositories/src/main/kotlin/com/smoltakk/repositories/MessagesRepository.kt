@@ -47,11 +47,14 @@ class MessagesRepositoryImpl @Inject constructor(override val database: Database
     }
 
     override fun getTopicsForRoom(id: Int): List<Topic> {
-        return DbTopic.innerJoin(DbRoom).select { DbRoom.id eq id }.andWhere { DbRoom.id eq DbTopic.room }.map { topicResult ->
-            hydrateTopic(topicResult,
-                TopicHydrationType.ABBREVIATED
-            )
-        }
+        return DbTopic.innerJoin(DbRoom).select { DbRoom.id eq id }
+            .andWhere { DbRoom.id eq DbTopic.room }
+            .orderBy( DbTopic.id, SortOrder.DESC)
+            .map { topicResult ->
+                hydrateTopic(topicResult,
+                    TopicHydrationType.ABBREVIATED
+                )
+            }
     }
 
     override fun getTopicById(id: TopicId): Topic? {
