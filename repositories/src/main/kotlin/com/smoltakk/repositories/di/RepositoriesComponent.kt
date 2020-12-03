@@ -14,7 +14,7 @@ import org.jetbrains.exposed.sql.Database
 import javax.inject.Singleton
 
 @Component(modules=[RepositoriesModule::class])
-@Singleton
+@RepositorySingleton
 interface RepositoriesComponent {
 
     fun userRepository(): UserRepository

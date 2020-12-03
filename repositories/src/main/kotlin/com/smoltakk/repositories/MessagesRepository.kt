@@ -4,10 +4,10 @@ import com.smoltakk.models.Reply
 import com.smoltakk.models.Room
 import com.smoltakk.models.Topic
 import com.smoltakk.models.User
+import com.smoltakk.repositories.di.RepositorySingleton
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
 import javax.inject.Inject
-import javax.inject.Singleton
 import com.smoltakk.db.Reply as DbReply
 import com.smoltakk.db.Room as DbRoom
 import com.smoltakk.db.Topic as DbTopic
@@ -25,7 +25,7 @@ interface MessagesRepository : Repository {
     fun carryOverTopic(topicId: TopicId)
 }
 
-@Singleton
+@RepositorySingleton
 class MessagesRepositoryImpl @Inject constructor(override val database: Database, private val userRepository: UserRepository) :
     MessagesRepository {
     private enum class TopicHydrationType {

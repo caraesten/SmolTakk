@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     application
     id("com.github.johnrengelman.shadow") version "5.0.0"
+    kotlin("kapt")
 }
 
 group = "com.smoltakk"
@@ -24,6 +25,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:0.26.1")
     implementation(project(":repositories"))
     implementation(project(":models"))
+    api("com.google.dagger:dagger:2.30.1")
+    kapt("com.google.dagger:dagger-compiler:2.30.1")
 }
 
 application {
