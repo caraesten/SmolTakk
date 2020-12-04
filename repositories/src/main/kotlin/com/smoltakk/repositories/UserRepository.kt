@@ -24,7 +24,12 @@ interface UserRepository : Repository {
     fun findUserById(id: Int): User?
     fun findUserByUsername(username: String): User?
     fun findUserByAuthToken(authToken: String): User?
-    fun updateUserProfile(user: User, username: String?, password: String?, email: String?): UserUpdateStatus
+    fun updateUserProfile(user: User,
+                          username: String?,
+                          password: String?,
+                          email: String?,
+                          titleTextColor: String?,
+                          titleBackgroundColor: String?): UserUpdateStatus
 }
 
 @RepositorySingleton
@@ -83,7 +88,9 @@ class UserRepositoryImpl @Inject constructor(override val database: Database,
         user: User,
         username: String?,
         password: String?,
-        email: String?
+        email: String?,
+        titleTextColor: String?,
+        titleBackgroundColor: String?
     ): UserRepository.UserUpdateStatus {
         if (!username.isNullOrEmpty()) {
             val existingUser = findUserByUsername(username)
@@ -91,9 +98,20 @@ class UserRepositoryImpl @Inject constructor(override val database: Database,
                 return UserRepository.UserUpdateStatus.AlreadyExists
             }
         }
+
+        val newTitleTextColor = if (!titleTextColor.isNullOrEmpty()) {
+            try { titleTextColor.toLong(16); titleTextColor } catch(e: Exception) { null }
+        } else { null }
+
+        val newTitleBackgroundColor = if (!titleBackgroundColor.isNullOrEmpty()) {
+            try { titleBackgroundColor.toLong(16); titleBackgroundColor } catch(e: Exception) { null }
+        } else { null }
+
         val intermediateUser = user.copy(
             username = username ?: user.username,
-            email = email ?: user.email)
+            email = email ?: user.email,
+            titleTextColor = newTitleTextColor ?: user.titleTextColor,
+            titleBackgroundColor = newTitleBackgroundColor ?: user.titleBackgroundColor)
         val timestamp = System.currentTimeMillis().toString()
         val (hashedPassword, salt) = password?.let {
             val newSalt = generateSalt(timestamp, intermediateUser.username)
@@ -110,6 +128,8 @@ class UserRepositoryImpl @Inject constructor(override val database: Database,
         val result = DbUser.update({DbUser.id eq user.id }) { dbUser ->
             dbUser[DbUser.username] = newUser.username
             dbUser[DbUser.email] = newUser.email
+            dbUser[DbUser.titleTextColor] = newUser.titleTextColor
+            dbUser[DbUser.titleBackgroundColor] = newUser.titleBackgroundColor
             if (!hashedPassword.isNullOrEmpty()) {
                 dbUser[DbUser.hashedPassword] = hashedPassword
                 dbUser[DbUser.salt] = salt!!
@@ -125,10 +145,12 @@ class UserRepositoryImpl @Inject constructor(override val database: Database,
 
     private fun hydrateUser(row: ResultRow): User {
         return User(
-            username = row[DbUser.username],
             email = row[DbUser.email],
+            username = row[DbUser.username],
             authToken = row[DbUser.authToken],
-            id = row[DbUser.id].value
+            id = row[DbUser.id].value,
+            titleTextColor = row[DbUser.titleTextColor],
+            titleBackgroundColor = row[DbUser.titleBackgroundColor]
         )
     }
 

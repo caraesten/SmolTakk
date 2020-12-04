@@ -16,6 +16,9 @@ import javax.inject.Inject
 private const val PARAM_USERNAME = "username"
 private const val PARAM_PASSWORD = "password"
 private const val PARAM_EMAIL = "email"
+private const val PARAM_TITLE_TEXT_COLOR = "title_text_color"
+private const val PARAM_TITLE_BACKGROUND_COLOR = "title_background_color"
+
 
 interface ProfileController : WithAuth, Controller {
     suspend fun getProfile(call: ApplicationCall, username: String?): View
@@ -46,11 +49,15 @@ class ProfileControllerImpl @Inject constructor(override val userRepository: Use
                     } else {
                         val newUsername = if (params[PARAM_USERNAME].equals(loggedInUser.username)) null else params[PARAM_USERNAME]
                         val newEmail = if (params[PARAM_EMAIL].equals(loggedInUser.username)) null else params[PARAM_EMAIL]
+                        val newTitleTextColor = if (params[PARAM_TITLE_TEXT_COLOR].equals(loggedInUser.titleTextColor)) null else params[PARAM_TITLE_TEXT_COLOR]?.trim('#', ' ')
+                        val newTitleBackgroundColor = if (params[PARAM_TITLE_BACKGROUND_COLOR].equals(loggedInUser.titleBackgroundColor)) null else params[PARAM_TITLE_BACKGROUND_COLOR]?.trim('#', ' ')
                         val result = userRepository.updateUserProfile(
                             loggedInUser,
                             newUsername,
                             params[PARAM_PASSWORD],
-                            newEmail
+                            newEmail,
+                            newTitleTextColor,
+                            newTitleBackgroundColor
                         )
                         val redirUser = if (result is UserRepository.UserUpdateStatus.Success) {
                             call.sessions.set(SiteSession(authToken = result.user.authToken))

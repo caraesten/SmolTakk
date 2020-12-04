@@ -21,7 +21,9 @@ object UpdateUser : UserTools() {
                     userToUpdate,
                     newUsername,
                     newPassword,
-                    newEmail
+                    newEmail,
+                    userToUpdate.titleTextColor,
+                    userToUpdate.titleBackgroundColor
                 )
             }
             if (status is UserRepository.UserUpdateStatus.Success) {

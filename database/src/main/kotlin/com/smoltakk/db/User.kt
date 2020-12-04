@@ -12,4 +12,6 @@ object User: IntIdTable(){
     val salt: Column<String> = varchar("salt", 200)
     val authToken: Column<String> = varchar("auth_token", 200)
     val tokenIssued: Column<LocalDateTime> = datetime("token_issued")
+    val titleTextColor: Column<String> = varchar("title_text_color", 16).default("fff")
+    val titleBackgroundColor: Column<String> = varchar("title_background_color", 16).default("000")
 }

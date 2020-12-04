@@ -51,7 +51,7 @@ h2 {
     font-size: 10pt;
 }
 
-.message h3 {
+h3 {
     background-color: black;
     color: white;
     font-size: 12pt;
@@ -60,15 +60,15 @@ h2 {
     font-weight: normal;
 }
 
-.message h3 span {
+h3 span {
     display: block;
 }
 
-.message h3 span.username {
+h3 span.username {
     text-align: right;
 }
 
-.message h3 span.title {
+h3 span.title {
     float: left;
 }
 

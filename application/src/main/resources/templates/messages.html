@@ -20,14 +20,14 @@
         </div>
         {{#header}}
             <div class="message header topic">
-                <h3><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>
+                <h3 style="background-color: #{{author.titleBackgroundColor}}; color: #{{author.titleTextColor}};"><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>
                 <p>{{{body}}}</p>
                 <p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>
             </div>
         {{/header}}
         {{#firstTwoMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
-                {{#isTopics}}<h3><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>{{/isTopics}}
+                {{#isTopics}}<h3 style="background-color: #{{author.titleBackgroundColor}}; color: #{{author.titleTextColor}};"><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>{{/isTopics}}
                 <p>{{{body}}}</p>
                 {{#isReplies}}<p class="attribution">-{{author.username}}</p>{{/isReplies}}
                 {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}

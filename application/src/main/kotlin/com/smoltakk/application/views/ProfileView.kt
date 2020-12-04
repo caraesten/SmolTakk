@@ -6,5 +6,9 @@ import com.smoltakk.application.views.viewmodels.Profile
 
 class ProfileView(override val call: ApplicationCall, user: User) : MustacheView<Profile>(call) {
     override val templatePath = "profile.html"
-    override val templateData = Profile(email = user.email, username = user.username)
+    override val templateData = Profile(
+        email = user.email,
+        username = user.username,
+        titleTextColor = user.titleTextColor,
+        titleBackgroundColor = user.titleBackgroundColor)
 }

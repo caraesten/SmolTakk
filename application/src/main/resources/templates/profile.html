@@ -20,6 +20,12 @@
                     <label for="password">Password:</label>
                     <input name="password" id="password" type="password" />
                     <p class="smalltext">(leave this blank, unless you want to change it!)</p>
+                    <label for="title-text-color">Post header text color:</label>
+                    <span>#</span><input name="title_text_color" id="title-text-color" type="text" value="{{titleTextColor}}"/><br />
+                    <label for="title-background-color">Post header background color:</label>
+                    <span>#</span></span><input name="title_background_color" id="title-background-color" type="text" value="{{titleBackgroundColor}}"/><br />
+                    <p class="smalltext">Your header looks like this:</p>
+                    <h3 style="background-color: #{{titleBackgroundColor}}; color: #{{titleTextColor}};">Post title</h3>
                     <input type="submit" />
                 </form>
                 <a href="{{logoutUrl}}">logout!</a>
