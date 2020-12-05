@@ -47,7 +47,7 @@ class ProfileControllerImpl @Inject constructor(override val userRepository: Use
                     if (user != loggedInUser) {
                         Http403View(call)
                     } else {
-                        val newUsername = if (params[PARAM_USERNAME].equals(loggedInUser.username)) null else params[PARAM_USERNAME]
+                        val newUsername = if (params[PARAM_USERNAME].equals(loggedInUser.username)) null else params[PARAM_USERNAME]?.replace("\\s", "")
                         val newEmail = if (params[PARAM_EMAIL].equals(loggedInUser.username)) null else params[PARAM_EMAIL]
                         val newTitleTextColor = if (params[PARAM_TITLE_TEXT_COLOR].equals(loggedInUser.titleTextColor)) null else params[PARAM_TITLE_TEXT_COLOR]?.trim('#', ' ')
                         val newTitleBackgroundColor = if (params[PARAM_TITLE_BACKGROUND_COLOR].equals(loggedInUser.titleBackgroundColor)) null else params[PARAM_TITLE_BACKGROUND_COLOR]?.trim('#', ' ')
