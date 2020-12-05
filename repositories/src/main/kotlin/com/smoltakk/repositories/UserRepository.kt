@@ -57,13 +57,7 @@ class UserRepositoryImpl @Inject constructor(override val database: Database,
         return obj?.let { row ->
             val salt = row[DbUser.salt]
             if (row[DbUser.hashedPassword] == generateHashedPassword(salt, password)) {
-                val user = hydrateUser(row)
-                val newToken = generateToken(user.username, System.currentTimeMillis().toString())
-                DbUser.update ({ DbUser.email eq user.email}) {
-                    it[authToken] = newToken
-                    it[tokenIssued] = LocalDateTime.now()
-                }
-                user.copy(authToken = newToken)
+                hydrateUser(row)
             } else null
         }
     }
@@ -133,9 +127,9 @@ class UserRepositoryImpl @Inject constructor(override val database: Database,
             if (!hashedPassword.isNullOrEmpty()) {
                 dbUser[DbUser.hashedPassword] = hashedPassword
                 dbUser[DbUser.salt] = salt!!
-                dbUser[DbUser.authToken] = newToken
-                dbUser[DbUser.tokenIssued] = LocalDateTime.now()
             }
+            dbUser[DbUser.authToken] = newToken
+            dbUser[DbUser.tokenIssued] = LocalDateTime.now()
         }
 
         return if (result == 1) UserRepository.UserUpdateStatus.Success(
