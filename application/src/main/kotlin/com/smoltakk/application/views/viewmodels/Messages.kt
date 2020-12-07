@@ -11,12 +11,14 @@ import java.time.Period
 import kotlin.time.ExperimentalTime
 import kotlin.time.toKotlinDuration
 
-data class Messages<T : Message>(val messages: List<T>,
+data class Messages<T : Message>(private val messagesData: List<T>,
                                  val rootId: Int,
                                  val activeUser: User,
                                  val activeRoom: Room,
-                                 val header: Message? = null) {
+                                 private val headerData: Message? = null) {
 
+    val header = if (headerData != null) { Message(headerData) } else { null }
+    val messages = messagesData.map { Message(it) }
     // I like the explicitness of this, it makes the template easier to read :)
     val isReplies = header != null
     val isTopics = header == null
@@ -47,5 +49,4 @@ data class Messages<T : Message>(val messages: List<T>,
     val profileUrl = Urls.getProfileUrl(activeUser.username)
 
     private data class DurationComponents(val days: Int, val hours: Int, val minutes: Int)
-
 }

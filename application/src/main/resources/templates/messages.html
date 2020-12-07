@@ -19,14 +19,14 @@
         {{#header}}
             <div class="message header topic">
                 <h3 style="background-color: #{{author.titleBackgroundColor}}; color: #{{author.titleTextColor}};"><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>
-                <p>{{{body}}}</p>
+                <p>{{{bodyNoScript}}}</p>
                 <p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>
             </div>
         {{/header}}
         {{#firstTwoMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
                 {{#isTopics}}<h3 style="background-color: #{{author.titleBackgroundColor}}; color: #{{author.titleTextColor}};"><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>{{/isTopics}}
-                <p>{{{body}}}</p>
+                {{#isTopics}}<p>{{{bodyNoScript}}}</p>{{/isTopics}}{{#isReplies}}<p>{{{body}}}</p>{{/isReplies}}
                 {{#isReplies}}<p class="attribution">-{{author.username}}</p>{{/isReplies}}
                 {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}
             </div>
@@ -45,7 +45,7 @@
         {{#remainingMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
                 {{#isTopics}}<h3 style="background-color: #{{author.titleBackgroundColor}}; color: #{{author.titleTextColor}};"><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>{{/isTopics}}
-                <p>{{{body}}}</p>
+                {{#isTopics}}<p>{{{bodyNoScript}}}</p>{{/isTopics}}{{#isReplies}}<p>{{{body}}}</p>{{/isReplies}}
                 {{#isReplies}}<p class="attribution">-{{author.username}}</p>{{/isReplies}}
                 {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}
             </div>
