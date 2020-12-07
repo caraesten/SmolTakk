@@ -12,6 +12,8 @@ data class Message<T : Message>(val underlying: T) {
     val posted: LocalDateTime by underlying::posted
     val url: String by underlying::url
 
+    val title = if (underlying is Topic) { underlying.title } else ""
+
     val replyCount = if (underlying is Topic) { underlying.replyCount } else { 0 }
     val replies = if (underlying is Topic) { underlying.replies } else { emptyList() }
 
