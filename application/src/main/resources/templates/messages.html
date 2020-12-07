@@ -29,6 +29,7 @@
                 {{#isTopics}}<p>{{{bodyNoScript}}}</p>{{/isTopics}}{{#isReplies}}<p>{{{body}}}</p>{{/isReplies}}
                 {{#isReplies}}<p class="attribution">-{{author.username}}</p>{{/isReplies}}
                 {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}
+                {{#repliesContainScripts}}<p class="script-warning">...here be javascripts...</p>{{/repliesContainScripts}}
             </div>
         {{/firstTwoMessages}}
         {{#isTopics}}
@@ -48,6 +49,7 @@
                 {{#isTopics}}<p>{{{bodyNoScript}}}</p>{{/isTopics}}{{#isReplies}}<p>{{{body}}}</p>{{/isReplies}}
                 {{#isReplies}}<p class="attribution">-{{author.username}}</p>{{/isReplies}}
                 {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}
+                {{#repliesContainScripts}}<p class="script-warning">...here be javascripts...</p>{{/repliesContainScripts}}
             </div>
         {{/remainingMessages}}
 

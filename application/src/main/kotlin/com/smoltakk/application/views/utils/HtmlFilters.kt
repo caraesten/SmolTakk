@@ -11,7 +11,7 @@ abstract class HtmlFilters {
     }
 
     fun containsTag(input: String): Boolean {
-        return input.matches(regex)
+        return regex.containsMatchIn(input)
     }
 
     private fun replaceWithHtmlEntities(character: String): String {

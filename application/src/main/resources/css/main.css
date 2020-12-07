@@ -142,3 +142,9 @@ p.attribution {
     text-align: right;
     padding-bottom: 0.25em;
 }
+
+p.script-warning {
+    text-align: center;
+    font-size: 10pt;
+    color: #777;
+}

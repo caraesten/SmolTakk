@@ -17,4 +17,6 @@ data class Message<T : Message>(val underlying: T) {
 
     val bodyNoScript = ScriptFilters.escapeTag(body)
     val containsScripts = ScriptFilters.containsTag(body)
+
+    val repliesContainScripts = replies.any { ScriptFilters.containsTag(it.body) }
 }
