@@ -148,3 +148,11 @@ p.script-warning {
     font-size: 10pt;
     color: #777;
 }
+
+form.delete-form {
+    text-align: right;
+}
+
+form.delete-form input {
+    font-size: 8pt;
+}

@@ -7,4 +7,5 @@ interface Message {
     val author: User
     val posted: LocalDateTime
     val url: String
+    val id: Int
 }

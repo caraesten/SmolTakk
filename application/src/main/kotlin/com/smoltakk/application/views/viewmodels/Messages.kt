@@ -17,8 +17,8 @@ data class Messages<T : Message>(private val messagesData: List<T>,
                                  val activeRoom: Room,
                                  private val headerData: Message? = null) {
 
-    val header = if (headerData != null) { Message(headerData) } else { null }
-    val messages = messagesData.map { Message(it) }
+    val header = if (headerData != null) { Message(headerData, activeUser) } else { null }
+    val messages = messagesData.map { Message(it, activeUser) }
     // I like the explicitness of this, it makes the template easier to read :)
     val isReplies = header != null
     val isTopics = header == null

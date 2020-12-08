@@ -19,6 +19,11 @@
         {{#header}}
             <div class="message header topic">
                 <h3 style="background-color: #{{author.titleBackgroundColor}}; color: #{{author.titleTextColor}};"><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>
+                {{#canDelete}}
+                <form class="delete-form" action="{{deleteAction}}" method="post">
+                    <input type="submit" value="[x]" />
+                </form>
+                {{/canDelete}}
                 <p>{{{bodyNoScript}}}</p>
                 <p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>
             </div>
@@ -26,6 +31,11 @@
         {{#firstTwoMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
                 {{#isTopics}}<h3 style="background-color: #{{author.titleBackgroundColor}}; color: #{{author.titleTextColor}};"><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>{{/isTopics}}
+                {{#canDelete}}
+                <form class="delete-form" action="{{deleteAction}}" method="post">
+                    <input type="submit" value="[x]" />
+                </form>
+                {{/canDelete}}
                 {{#isTopics}}<p>{{{bodyNoScript}}}</p>{{/isTopics}}{{#isReplies}}<p>{{{body}}}</p>{{/isReplies}}
                 {{#isReplies}}<p class="attribution">-{{author.username}}</p>{{/isReplies}}
                 {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}
@@ -46,6 +56,11 @@
         {{#remainingMessages}}
             <div class="message {{#isReplies}}reply{{/isReplies}} {{#isTopics}}topic{{/isTopics}}">
                 {{#isTopics}}<h3 style="background-color: #{{author.titleBackgroundColor}}; color: #{{author.titleTextColor}};"><span class="title">{{title}}</span><span class="username">{{author.username}}</span></h3>{{/isTopics}}
+                {{#canDelete}}
+                <form class="delete-form" action="{{deleteAction}}" method="post">
+                    <input type="submit" value="[x]" />
+                </form>
+                {{/canDelete}}
                 {{#isTopics}}<p>{{{bodyNoScript}}}</p>{{/isTopics}}{{#isReplies}}<p>{{{body}}}</p>{{/isReplies}}
                 {{#isReplies}}<p class="attribution">-{{author.username}}</p>{{/isReplies}}
                 {{#isTopics}}<p class="replies">| <a href="{{url}}">{{replyCount}} replies</a> |</p>{{/isTopics}}

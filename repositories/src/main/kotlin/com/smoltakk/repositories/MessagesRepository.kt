@@ -124,6 +124,8 @@ class MessagesRepositoryImpl @Inject constructor(override val database: Database
     override fun deleteMessage(message: Message): Boolean {
         return when (message) {
             is Topic -> {
+                // as far as I can tell, the ORM doesn't support cascades over FKeys
+                DbReply.deleteWhere { DbReply.parent eq message.id }
                 DbTopic.deleteWhere { DbTopic.id eq message.id } > 0
             }
             is Reply -> {

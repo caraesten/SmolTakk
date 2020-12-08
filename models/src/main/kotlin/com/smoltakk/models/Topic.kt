@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 data class Topic(
     val title: String,
-    val id: Int,
+    override val id: Int,
     override val body: String,
     override val author: User,
     override val posted: LocalDateTime,
