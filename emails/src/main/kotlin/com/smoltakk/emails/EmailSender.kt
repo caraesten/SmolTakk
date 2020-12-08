@@ -27,7 +27,7 @@ class EmailSender(private val smtpSession: Session) {
             }
             setContent(multipart)
             setSentDate(Date())
-            setRecipients(Message.RecipientType.TO, InternetAddress.parse(users.map{ it.email}.joinToString(","), false)) }
+            setRecipients(Message.RecipientType.BCC, InternetAddress.parse(users.map{ it.email}.joinToString(","), false)) }
         Transport.send(message)
     }
 }

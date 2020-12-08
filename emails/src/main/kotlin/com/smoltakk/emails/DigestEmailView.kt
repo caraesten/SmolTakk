@@ -9,7 +9,7 @@ import kotlinx.html.stream.createHTML
 import java.time.LocalDateTime
 import java.time.Period
 
-class DigestEmailView(private val topics: List<Topic>, private val createdAt: LocalDateTime) : EmailView {
+class DigestEmailView(private val topics: List<Topic>, private val createdAt: LocalDateTime, private val siteUrl: String) : EmailView {
     override val subject = "Yr daily TALK digest!"
 
     private val willExpire = (createdAt + Period.ofDays(Room.ROOM_TTL_DAYS))
@@ -37,7 +37,7 @@ class DigestEmailView(private val topics: List<Topic>, private val createdAt: Lo
                             text(topic.body)
                         }
                         p {
-                            a(href=Urls.getReviveUrl(topic.id.toString())) {
+                            a(href="http://$siteUrl${Urls.getReviveUrl(topic.id.toString())}") {
                                 text("Is this from a previous discussion? Click here to revive it!")
                             }
                         }
