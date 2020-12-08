@@ -1,9 +1,6 @@
 package com.smoltakk.repositories
 
-import com.smoltakk.models.Reply
-import com.smoltakk.models.Room
-import com.smoltakk.models.Topic
-import com.smoltakk.models.User
+import com.smoltakk.models.*
 import com.smoltakk.repositories.di.RepositorySingleton
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDateTime
@@ -19,9 +16,11 @@ interface MessagesRepository : Repository {
     fun getAllRooms(hydrateTopics: Boolean = false): List<Room>
     fun getTopicsForRoom(id: Int): List<Topic>
     fun getTopicById(id: Int): Topic?
+    fun getReplyById(id: Int): Reply?
     fun createRoom(): Room?
     fun createTopic(title: String, body: String, author: User): TopicId?
     fun createReply(parentId: Int, body: String, author: User): TopicId?
+    fun deleteMessage(message: Message): Boolean
     fun carryOverTopic(topicId: TopicId)
 }
 
@@ -61,6 +60,18 @@ class MessagesRepositoryImpl @Inject constructor(override val database: Database
         return DbTopic.select { DbTopic.id eq id }.firstOrNull()?.let {
             hydrateTopic(it,
                 TopicHydrationType.DEEP
+            )
+        }
+    }
+
+    override fun getReplyById(id: Int): Reply? {
+        return DbReply.select { DbReply.id eq id }.firstOrNull()?.let {
+            Reply(
+                topic = getTopicById(it[DbReply.parent])!!,
+                id = it[DbReply.id].value,
+                author = userRepository.findUserById(it[DbReply.author])!!,
+                body = it[DbReply.body],
+                posted = it[DbReply.posted]
             )
         }
     }
@@ -110,6 +121,20 @@ class MessagesRepositoryImpl @Inject constructor(override val database: Database
         return parentId
     }
 
+    override fun deleteMessage(message: Message): Boolean {
+        return when (message) {
+            is Topic -> {
+                DbTopic.deleteWhere { DbTopic.id eq message.id } > 0
+            }
+            is Reply -> {
+                DbReply.deleteWhere { DbReply.id eq message.id } > 0
+            }
+            else -> {
+                false
+            }
+        }
+    }
+
     override fun carryOverTopic(topicId: TopicId) {
         val activeRoom = getActiveRoom(false)
         if (activeRoom == null) {
@@ -152,6 +177,7 @@ class MessagesRepositoryImpl @Inject constructor(override val database: Database
     private fun hydrateReply(row: ResultRow, topic: Topic): Reply {
         return Reply(
             author = userRepository.findUserById(row[DbReply.author]) ?: User.getEmptyUser(),
+            id = row[DbReply.id].value,
             body = row[DbReply.body],
             posted = row[DbReply.posted],
             topic = topic

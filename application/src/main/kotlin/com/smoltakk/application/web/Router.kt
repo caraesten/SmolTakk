@@ -8,6 +8,8 @@ import com.smoltakk.models.Urls.ROOM_URL
 import com.smoltakk.models.Urls.getReviveUrl
 import com.smoltakk.models.Urls.getTopicUrl
 import com.smoltakk.application.controllers.*
+import com.smoltakk.models.Urls.getReplyDeleteUrl
+import com.smoltakk.models.Urls.getTopicDeleteUrl
 import io.ktor.application.call
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
@@ -56,6 +58,12 @@ class Router(
             }
             post(getTopicUrl("{topic_id}")) {
                 messagesController.postNewReply(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()
+            }
+            post(getTopicDeleteUrl("{topic_id}")) {
+                messagesController.deleteTopic(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()
+            }
+            post(getReplyDeleteUrl("{reply_id}")) {
+                messagesController.deleteReply(call.parameters["reply_id"]?.toIntOrNull() ?: -1, call).render()
             }
             get(getReviveUrl("{topic_id}")) {
                 messagesController.carryOverTopic(call.parameters["topic_id"]?.toIntOrNull() ?: -1, call).render()

@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 data class Reply(
     val topic: Topic,
+    val id: Int,
     override val author: User,
     override val body: String,
     override val posted: LocalDateTime) : Message {

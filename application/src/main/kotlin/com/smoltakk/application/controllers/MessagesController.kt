@@ -7,7 +7,9 @@ import com.smoltakk.application.controllers.mixins.WithAuth
 import com.smoltakk.application.di.ApplicationSingleton
 import io.ktor.application.ApplicationCall
 import com.smoltakk.application.views.*
+import com.smoltakk.models.Message
 import com.smoltakk.models.Urls.getRoomUrl
+import com.smoltakk.models.User
 import javax.inject.Inject
 
 private const val PARAM_SUBJECT = "subject"
@@ -18,6 +20,8 @@ interface MessagesController : WithAuth, Controller {
     suspend fun getTopicPage(topicId: Int, call: ApplicationCall): View
     suspend fun postNewTopic(roomId: Int, call: ApplicationCall): View
     suspend fun postNewReply(topicId: Int, call: ApplicationCall): View
+    suspend fun deleteTopic(topicId: Int, call: ApplicationCall): View
+    suspend fun deleteReply(replyId: Int, call: ApplicationCall): View
     suspend fun carryOverTopic(topicId: Int, call: ApplicationCall): View
 }
 
@@ -89,6 +93,30 @@ class MessagesControllerImpl @Inject constructor(override val userRepository: Us
         }
     }
 
+    override suspend fun deleteTopic(topicId: Int, call: ApplicationCall): View {
+        return withAuth(call) { loggedInUser ->
+            if (topicId == -1) {
+                return@withAuth Http404View(call)
+            }
+            withTransaction(messagesRepository) {
+                val topic = messagesRepository.getTopicById(topicId)
+                deleteMessage(topic, loggedInUser, call)
+            }
+        }
+    }
+
+    override suspend fun deleteReply(replyId: Int, call: ApplicationCall): View {
+        return withAuth(call) { loggedInUser ->
+            if (replyId == -1) {
+                return@withAuth Http404View(call)
+            }
+            withTransaction(messagesRepository) {
+                val topic = messagesRepository.getReplyById(replyId)
+                deleteMessage(topic, loggedInUser, call)
+            }
+        }
+    }
+
     override suspend fun carryOverTopic(topicId: Int, call: ApplicationCall): View {
         return withAuth(call) {
             if (topicId == -1) {
@@ -98,6 +126,20 @@ class MessagesControllerImpl @Inject constructor(override val userRepository: Us
                 messagesRepository.carryOverTopic(topicId)
             }
             RedirectView(call, getTopicUrl(topicId.toString()))
+        }
+    }
+
+    private fun deleteMessage(message: Message?, loggedInUser: User, call: ApplicationCall): View {
+        return if (message == null) {
+            Http404View(call)
+        } else {
+            if (message.author == loggedInUser) {
+                messagesRepository.deleteMessage(message)
+                val room = messagesRepository.getActiveRoom()
+                RedirectView(call, getRoomUrl(room?.id ?: 0))
+            } else {
+                Http403View(call)
+            }
         }
     }
 }
